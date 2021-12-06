@@ -11,7 +11,7 @@ import tensorflow as tf
 import SRNDeblur.models.model_streamlit as srn_model
 from SwinIR.utils import util_calculate_psnr_ssim as util
 
-BASE_DIR = './drive/MyDrive/streamlit/'
+BASE_DIR = ''
 
 @st.cache
 def define_model(model_kind):

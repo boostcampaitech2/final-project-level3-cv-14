@@ -13,7 +13,7 @@ from datetime import datetime
 from ..util.util import *
 from ..util.BasicConvLSTMCell import *
 
-BASE_DIR = './drive/MyDrive/streamlit/'
+BASE_DIR = './'
 
 class DEBLUR(object):
     def __init__(self, args):
