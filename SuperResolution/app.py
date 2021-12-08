@@ -7,7 +7,8 @@ import cv2
 import argparse
 import os
 import tensorflow as tf
-from SuperRes.predict import Predictor
+from SuperRes.predict import Predictor as sr_predictor
+from Deblur.predict import Predictor as db_predictor
 
 def main():
 	#st.title("Awesome Streamlit for MLDDD")
@@ -28,22 +29,21 @@ def main():
       image = Image.open(uploaded_file1)
       st.image(image, caption='Original Image', use_column_width=False)
       st.write("")
-      sr_predictor = Predictor()
-      new_image = sr_predictor.predict(image) #TODO: sidebar에서 선택한 args 넘겨주기
+      new_image = sr_predictor().predict(image) #TODO: sidebar에서 선택한 args 넘겨주기
       st.image(new_image, caption='Processed Image', use_column_width=True)
       #st.write("(psnr, ssim, psnr_y, ssim_y) = ",score)
 
-#   ### Deblur ###
-#   st.title("Deblur")
-#   st.write("Blurry 이미지를 보정해줍니다.")
+  ### Deblur ###
+  st.title("Deblur")
+  st.write("Blurry 이미지를 보정해줍니다.")
 
-#   uploaded_file2 = st.file_uploader("Choose an image...", type="jpg",key="DB")
-#   if uploaded_file2 is not None:
-#       image = Image.open(uploaded_file2)
-#       st.image(image, caption='Original Image', use_column_width=False)
-#       st.write("")
-#       new_image = predict_DB(image)
-#       st.image(new_image, caption='Processed Image', use_column_width=True)
+  uploaded_file2 = st.file_uploader("Choose an image...", type="jpg",key="DB")
+  if uploaded_file2 is not None:
+      image = Image.open(uploaded_file2)
+      st.image(image, caption='Original Image', use_column_width=False)
+      st.write("")
+      new_image = db_predictor().predict(image)
+      st.image(new_image, caption='Processed Image', use_column_width=True)
 
 if __name__ == '__main__':
 	main()
