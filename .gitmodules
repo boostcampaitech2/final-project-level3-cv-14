@@ -1,0 +1,3 @@
+[submodule "Inpainting/lama"]
+	path = Inpainting/lama
+	url = https://github.com/saic-mdal/lama.git
