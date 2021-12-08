@@ -10,7 +10,7 @@ import tensorflow.contrib.slim as slim
 from datetime import datetime
 from .utils import *
 
-BASE_DIR = '/opt/ml/final-project/SuperResolution/Deblur/'
+BASE_DIR = '/opt/ml/final-project/SuperResolution/Deblur/weights/'
 
 class DEBLUR(object):
     def __init__(self, args):
@@ -19,7 +19,7 @@ class DEBLUR(object):
         self.scale = 0.5
         self.chns = 3 if self.args.model == 'color' else 1  # input / output channels
         self.crop_size = 256
-        self.train_dir = os.path.join(BASE_DIR+'weights', args.model)
+        self.train_dir = os.path.join(BASE_DIR, args.model)
         if not os.path.exists(self.train_dir):
             os.makedirs(self.train_dir)
 
