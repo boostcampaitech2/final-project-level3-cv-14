@@ -20,7 +20,9 @@ click==7.1.2
 debugpy==1.5.1
 decorator==5.1.0
 defusedxml==0.7.1
+Deprecated==1.2.13
 entrypoints==0.3
+Flask==2.0.2
 gast==0.2.2
 gitdb==4.0.9
 GitPython==3.1.24
@@ -34,6 +36,7 @@ ipykernel==6.5.0
 ipython==7.29.0
 ipython-genutils==0.2.0
 ipywidgets==7.6.5
+itsdangerous==2.0.1
 jedi==0.18.0
 Jinja2==3.0.2
 json5==0.9.6
@@ -84,6 +87,7 @@ pytz==2021.3
 pytz-deprecation-shim==0.1.0.post0
 PyYAML==6.0
 pyzmq==22.3.0
+redis==4.0.2
 requests==2.26.0
 scipy==1.1.0
 Send2Trash==1.8.0
