@@ -13,7 +13,7 @@ from .main_test_swinir import define_model, setup, get_image_pair
 
 class Predictor():
     def __init__(self):
-        model_dir = '/opt/ml/final-project/SuperResolution/SuperRes/weights/'
+        model_dir = '/opt/ml/final-project/src/SuperRes/weights/'
 
         self.model_zoo = {
             'real_sr': {

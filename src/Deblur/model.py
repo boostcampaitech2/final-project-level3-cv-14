@@ -10,7 +10,7 @@ import tensorflow.contrib.slim as slim
 from datetime import datetime
 from .utils import *
 
-BASE_DIR = '/opt/ml/final-project/SuperResolution/Deblur/weights/'
+BASE_DIR = '/opt/ml/final-project/src/Deblur/weights/'
 
 class DEBLUR(object):
     def __init__(self, args):
