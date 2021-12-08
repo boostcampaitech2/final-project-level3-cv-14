@@ -10,7 +10,7 @@
 - Image-Inpainting : `streamlit run app.py --server.port 6006`
 
 # TODO
-[X] People Segmentation 기능을 모듈화하여 app.py에 추가 (~12.08 피어세션 전까지)
-[ ] 코드 정리
-[ ] inpur_image, output_image, 저장일자, 파일 이름 등을 클라우드 DB에 저장하기
+- [X] People Segmentation 기능을 모듈화하여 app.py에 추가 (~12.08 피어세션 전까지)
+- [ ] 코드 정리
+- [ ] inpur_image, output_image, 저장일자, 파일 이름 등을 클라우드 DB에 저장하기
 
