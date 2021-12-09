@@ -4,6 +4,7 @@ import tensorflow as tf
 import torch
 import numpy as np
 from .model import DEBLUR
+import streamlit as st
 
 class Predictor():
     def __init__(self):
@@ -20,7 +21,7 @@ class Predictor():
                             help='width for the tensorflow placeholder, should be multiple of 16 for 3 scales')
         self.args = parser.parse_args()
 
-
+    @st.cache
     def predict(self,image):
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         deblur = DEBLUR(self.args)
