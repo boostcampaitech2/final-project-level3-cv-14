@@ -33,7 +33,6 @@ async def predict(files:UploadFile=File(...)):
     image_bytes = await files.read()
     image = Image.open(io.BytesIO(image_bytes))
     new_image = db_predictor().predict(image)
-    print(type(new_image))
     new_image = Image.fromarray(new_image.astype('uint8'), 'RGB')
 
     img_byte = io.BytesIO()
