@@ -42,7 +42,6 @@ def main():
 
     if uploaded_file is not None:
       image = Image.open(uploaded_file)
-      st.image(image, caption='Original Image', use_column_width=True)
       st.write("")
 
       # TODO: image crop canvas 수정필요
@@ -59,13 +58,15 @@ def main():
           img_byte_arr = img_byte_arr.getvalue()
           files = {'files':img_byte_arr}
           response = requests.post('http://127.0.0.1:8000/super',files=files) #TODO: change into server addr
+        if response.status_code==200:
           bytes_data = io.BytesIO(response.content)
           new_image = Image.open(bytes_data)
-        st.success('Done!')
-        col1, col2 = st.columns(2)
-        col1.image(cropped_img, caption='Cropped Image', use_column_width=True)
-        col2.image(new_image, caption='Processed Image', use_column_width=True)
-  
+          st.success('Done!')
+          col1, col2 = st.columns(2)
+          col1.image(cropped_img, caption='Cropped Image', use_column_width=True)
+          col2.image(new_image, caption='Processed Image', use_column_width=True)
+        else:
+          st.error('Error Status Code:{}'.format(response.status_code))
   ### Deblur ###
   elif choice=='Deblur':
     if uploaded_file is not None:
@@ -78,10 +79,13 @@ def main():
         with st.spinner('Processing...'):
           files = {'files':uploaded_file.getvalue()}
           response = requests.post('http://127.0.0.1:8000/deblur',files=files) #TODO: change into server addr
+        if response.status_code==200:
           bytes_data = io.BytesIO(response.content)
           new_image = Image.open(bytes_data)
-        st.success('Done!')
-        st.image(new_image, caption='Processed Image', use_column_width=True)
+          st.success('Done!')
+          st.image(new_image, caption='Processed Image', use_column_width=True)
+        else:
+          st.error('Error Status Code:{}'.format(response.status_code))
 
 if __name__ == '__main__':
 	main()
