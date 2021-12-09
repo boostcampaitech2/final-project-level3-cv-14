@@ -9,6 +9,7 @@ import torch
 from collections import OrderedDict
 import numpy as np
 from .main_test_swinir import define_model, setup, get_image_pair
+import streamlit as st
 
 
 class Predictor():
@@ -64,8 +65,8 @@ class Predictor():
             'JPEG Compression Artifact Reduction': 'jpeg_car'
         }
 
+    @st.cache
     def predict(self, image, task_type='Real-World Image Super-Resolution', jpeg=40, noise=15):
-
         self.args.task = self.tasks[task_type]
         self.args.noise = noise
         self.args.jpeg = jpeg
