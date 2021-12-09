@@ -5,8 +5,7 @@ import torch
 import numpy as np
 import streamlit as st
 import sys
-sys.path.append(os.getcwd())
-
+sys.path.append(os.path.join(os.getcwd(),'Deblur/SRNDeblur'))
 from SRNDeblur.run_model import parse_args
 from SRNDeblur.models.model import DEBLUR
 from SRNDeblur.util.util import *
@@ -23,6 +22,7 @@ class Deblur():
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         tf.reset_default_graph()
         self.deblur = DEBLUR(self.args)
+        self.deblur.train_dir = os.path.join(os.path.join(os.getcwd(),'Deblur/SRNDeblur'),self.deblur.train_dir)
         output = self.test(self.args.height, self.args.width,np.array(image))
         return output
         
@@ -64,8 +64,6 @@ class Deblur():
             blurPad = np.transpose(blurPad, (3, 1, 2, 0))
 
         deblur = sess.run(outputs, feed_dict={inputs: blurPad / 255.0})
-        #duration = time.time() - start
-        #print('Saving results: %s ... %4.3fs' % (os.path.join(output_path, imgName), duration))
         res = deblur[-1]
         if self.args.model != 'color':
             res = np.transpose(res, (3, 1, 2, 0))
