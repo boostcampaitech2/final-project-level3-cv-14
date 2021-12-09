@@ -18,6 +18,7 @@ def hello():
 async def predict(files:UploadFile=File(...)):
     image_bytes = await files.read()
     image = Image.open(io.BytesIO(image_bytes))
+    # TODO predictor init이 매번 되지 않도록
     new_image = sr_predictor().predict(image)
     new_image = Image.fromarray(new_image.astype('uint8'), 'RGB')
 
@@ -32,6 +33,7 @@ async def predict(files:UploadFile=File(...)):
 async def predict(files:UploadFile=File(...)):
     image_bytes = await files.read()
     image = Image.open(io.BytesIO(image_bytes))
+    # TODO predictor init이 매번 되지 않도록
     new_image = db_predictor().predict(image)
     new_image = Image.fromarray(new_image.astype('uint8'), 'RGB')
 
