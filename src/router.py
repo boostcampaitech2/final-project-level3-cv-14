@@ -5,10 +5,12 @@ import uvicorn
 from PIL import Image
 import io
 import base64
-from SuperRes.predict import Predictor as sr_predictor
-from Deblur.predict import Predictor as db_predictor
+from SuperRes.predict import Predictor as SRPredictor
+from Deblur.predict import Predictor as DBPredictor
 
 app = FastAPI()
+sr_predictor = SRPredictor()
+db_predictor = DBPredictor()
 
 @app.get('/hi')
 def hello():
@@ -18,23 +20,20 @@ def hello():
 async def predict_super(files:UploadFile=File(...)):
     image_bytes = await files.read()
     image = Image.open(io.BytesIO(image_bytes))
-    # TODO predictor init이 매번 되지 않도록
-    new_image = sr_predictor().predict(image)
+    new_image = sr_predictor.predict(image)
     new_image = Image.fromarray(new_image.astype('uint8'), 'RGB')
 
     img_byte = io.BytesIO()
     new_image.save(img_byte,"JPEG")
     img_byte.seek(0)
 
-    #return StreamingResponse(io.BytesIO(new_image.tobytes()))
     return StreamingResponse(img_byte,media_type="image/jpeg")
 
 @app.post('/deblur')
 async def predict_deblur(files:UploadFile=File(...)):
     image_bytes = await files.read()
     image = Image.open(io.BytesIO(image_bytes))
-    # TODO predictor init이 매번 되지 않도록
-    new_image = db_predictor().predict(image)
+    new_image = db_predictor.predict(image)
     new_image = Image.fromarray(new_image.astype('uint8'), 'RGB')
 
     img_byte = io.BytesIO()
