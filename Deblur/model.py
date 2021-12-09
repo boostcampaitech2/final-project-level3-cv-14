@@ -8,9 +8,10 @@ import numpy as np
 import tensorflow as tf
 import tensorflow.contrib.slim as slim
 from datetime import datetime
-from .utils import *
+from SRNDeblur.util.util import *
+from SRNDeblur.util.BasicConvLSTMCell import *
 
-BASE_DIR = '/opt/ml/final-project/src/Deblur/weights/'
+BASE_DIR = 'Deblur/SRNDeblur/checkpoints'
 
 class DEBLUR(object):
     def __init__(self, args):
