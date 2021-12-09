@@ -42,7 +42,7 @@ def main():
       
       ### Fast API 추론 start ###
       files = {'files':uploaded_file1.getvalue()}
-      response = requests.post('http://127.0.0.1:8000/super',files=files)
+      response = requests.post('http://127.0.0.1:8000/super',files=files) #TODO: change into server addr
       bytes_data = io.BytesIO(response.content)
       new_image = Image.open(bytes_data)
       ### Fast API 추론 end ###
@@ -59,7 +59,18 @@ def main():
       st.image(image, caption='Original Image', use_column_width=False)
       st.write("")
       #TODO: image crop
-      new_image = db_predictor().predict(image)
+
+      ###기존 함수 추론 start ###
+      #new_image = db_predictor().predict(image)
+      ###기존 함수 추론 end ###
+      
+      ### Fast API 추론 start ###
+      files = {'files':uploaded_file2.getvalue()}
+      response = requests.post('http://127.0.0.1:8000/deblur',files=files) #TODO: change into server addr
+      bytes_data = io.BytesIO(response.content)
+      new_image = Image.open(bytes_data)
+      ### Fast API 추론 end ###
+
       #TODO: image combine
       st.image(new_image, caption='Processed Image', use_column_width=True)
 
