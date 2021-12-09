@@ -3,7 +3,9 @@ import uvicorn
 from PIL import Image
 import io
 import sys
-sys.path.append('/opt/ml/final-project/')
+import os
+sys.path.append(os.getcwd())
+
 from Utils import ImageEncoder
 from Wrapper import SuperResolution
 
