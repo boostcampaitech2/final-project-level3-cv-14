@@ -16,8 +16,8 @@ app = FastAPI()
 async def inference(image: bytes = File(...), mask: bytes = File(...)):
     image = ImageEncoder.Decode(image, channels=3)
     mask = ImageEncoder.Decode(mask, channels=1)
-    result = lama.inference(image, mask)
-    image_bytes = ImageEncoder.Encode(result, ext='jpg', quality=90)
+    image_inpaint = lama.inference(image, mask)
+    image_bytes = ImageEncoder.Encode(image_inpaint, ext='jpg', quality=90)
     return Response(content=image_bytes)
 
 if __name__ == '__main__':
