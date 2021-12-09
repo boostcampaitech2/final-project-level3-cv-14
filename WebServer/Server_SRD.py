@@ -11,10 +11,10 @@ import streamlit as st
 import io
 import base64
 import requests
-from SuperRes.predict import Predictor as sr_predictor
-from Deblur.predict import Predictor as db_predictor
 from streamlit_cropper import st_cropper
-
+import sys
+sys.path.append(os.getcwd())
+from Utils import ImageEncoder
 
 def main():
   st.title("종합 이미지 보정 도구 ")
@@ -51,22 +51,19 @@ def main():
       #TODO: sidebar에서 선택한 args 넘겨주기
       if st.sidebar.button('결과 보기'):
         with st.spinner('Processing...'):
-          # https://stackoverflow.com/questions/33101935/convert-pil-image-to-byte-array
-          # TODO: 모듈화 된 함수 이용
-          img_byte_arr = io.BytesIO()
-          cropped_img.save(img_byte_arr, format='PNG')
-          img_byte_arr = img_byte_arr.getvalue()
+          image = np.array(cropped_img.convert('RGB'))
+          img_byte_arr = ImageEncoder.Encode(image, ext='jpg', quality=90)
           files = {'files':img_byte_arr}
           response = requests.post('http://127.0.0.1:8000/super',files=files) #TODO: change into server addr
         if response.status_code==200:
-          bytes_data = io.BytesIO(response.content)
-          new_image = Image.open(bytes_data)
+          new_image = ImageEncoder.Decode(response.content)
           st.success('Done!')
           col1, col2 = st.columns(2)
           col1.image(cropped_img, caption='Cropped Image', use_column_width=True)
           col2.image(new_image, caption='Processed Image', use_column_width=True)
         else:
           st.error('Error Status Code:{}'.format(response.status_code))
+
   ### Deblur ###
   elif choice=='Deblur':
     if uploaded_file is not None:

@@ -9,7 +9,3 @@ wget https://github.com/JingyunLiang/SwinIR/releases/download/v0.0/001_classical
 wget https://github.com/JingyunLiang/SwinIR/releases/download/v0.0/005_colorDN_DFWB_s128w8_SwinIR-M_noise15.pth -P SuperRes/weights
 wget https://github.com/JingyunLiang/SwinIR/releases/download/v0.0/005_colorDN_DFWB_s128w8_SwinIR-M_noise25.pth -P SuperRes/weights
 wget https://github.com/JingyunLiang/SwinIR/releases/download/v0.0/005_colorDN_DFWB_s128w8_SwinIR-M_noise50.pth -P SuperRes/weights
-
-wget http://www.xtao.website/shared_url/srndeblur_models.zip -P Deblur/weights
-cd Deblur/weights
-unzip srndeblur_models.zip
