@@ -13,7 +13,7 @@ import base64
 import requests
 from streamlit_cropper import st_cropper
 import sys
-sys.path.append('/opt/ml/final-project/')
+sys.path.append(os.getcwd())
 from Utils import ImageEncoder
 
 def main():
@@ -63,7 +63,7 @@ def main():
           col2.image(new_image, caption='Processed Image', use_column_width=True)
         else:
           st.error('Error Status Code:{}'.format(response.status_code))
-          
+
   ### Deblur ###
   elif choice=='Deblur':
     if uploaded_file is not None:
