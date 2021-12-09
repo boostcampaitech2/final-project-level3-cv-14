@@ -1,0 +1,6 @@
+[submodule "SwinIR"]
+	path = SuperResolution/SwinIR
+	url = https://github.com/JingyunLiang/SwinIR.git
+[submodule "SRN-Deblur"]
+	path = Deblur/SRNDeblur
+	url = https://github.com/jiangsutx/SRN-Deblur.git
