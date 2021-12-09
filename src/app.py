@@ -28,7 +28,7 @@ def main():
   uploaded_file = st.sidebar.file_uploader("Choose an image...", type="jpg",key="SR")
   if uploaded_file is not None:
     image = Image.open(uploaded_file)
-    st.image(image, caption='Original Image', use_column_width=False)
+    st.image(image, caption='Original Image', use_column_width=True)
     st.write("")
   
   #모듈 실행
@@ -44,20 +44,24 @@ def main():
     #TODO: image crop, resize scale 선택
     #TODO: sidebar에서 선택한 args 넘겨주기
     if st.sidebar.button('결과 보기'):
-      files = {'files':uploaded_file.getvalue()}
-      response = requests.post('http://127.0.0.1:8000/super',files=files) #TODO: change into server addr
-      bytes_data = io.BytesIO(response.content)
-      new_image = Image.open(bytes_data)
+      with st.spinner('Processing...'):
+        files = {'files':uploaded_file.getvalue()}
+        response = requests.post('http://127.0.0.1:8000/super',files=files) #TODO: change into server addr
+        bytes_data = io.BytesIO(response.content)
+        new_image = Image.open(bytes_data)
+      st.success('Done!')
       st.image(new_image, caption='Processed Image', use_column_width=True)
   
   ### Deblur ###
   elif choice=='Deblur':
     #TODO: image crop
     if st.sidebar.button('결과 보기'):
-      files = {'files':uploaded_file.getvalue()}
-      response = requests.post('http://127.0.0.1:8000/super',files=files) #TODO: change into server addr
-      bytes_data = io.BytesIO(response.content)
-      new_image = Image.open(bytes_data)
+      with st.spinner('Processing...'):
+        files = {'files':uploaded_file.getvalue()}
+        response = requests.post('http://127.0.0.1:8000/deblur',files=files) #TODO: change into server addr
+        bytes_data = io.BytesIO(response.content)
+        new_image = Image.open(bytes_data)
+      st.success('Done!')
       st.image(new_image, caption='Processed Image', use_column_width=True)
 
 if __name__ == '__main__':
