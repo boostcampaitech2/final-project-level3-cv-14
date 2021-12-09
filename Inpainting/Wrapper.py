@@ -16,10 +16,8 @@ from lama.saicinpainting.training.trainers import load_checkpoint
 from lama.saicinpainting.evaluation.data import pad_img_to_modulo
 from lama.saicinpainting.evaluation.utils import move_to_device
 
-device = torch.device('cuda')
-
 class LaMa:
-    def __init__(self, device):
+    def __init__(self, device='cuda'):
         self.device = torch.device(device)
 
         with open(r'big-lama/config.yaml', 'r') as f:
@@ -39,7 +37,7 @@ class LaMa:
         result['image'] = pad_img_to_modulo(result['image'], 8)
         result['mask'] = pad_img_to_modulo(result['mask'], 8)
 
-        batch = move_to_device(default_collate([result]), device)
+        batch = move_to_device(default_collate([result]), self.device)
 
         batch['mask'] = (batch['mask'] > 0) * 1
         batch = self.model(batch)
