@@ -15,7 +15,7 @@ def hello():
     return {"hello":"world"}
 
 @app.post('/super')
-async def predict(files:UploadFile=File(...)):
+async def predict_super(files:UploadFile=File(...)):
     image_bytes = await files.read()
     image = Image.open(io.BytesIO(image_bytes))
     # TODO predictor init이 매번 되지 않도록
@@ -30,7 +30,7 @@ async def predict(files:UploadFile=File(...)):
     return StreamingResponse(img_byte,media_type="image/jpeg")
 
 @app.post('/deblur')
-async def predict(files:UploadFile=File(...)):
+async def predict_deblur(files:UploadFile=File(...)):
     image_bytes = await files.read()
     image = Image.open(io.BytesIO(image_bytes))
     # TODO predictor init이 매번 되지 않도록
