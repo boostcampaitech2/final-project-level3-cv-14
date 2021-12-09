@@ -11,10 +11,7 @@ import streamlit as st
 import io
 import base64
 import requests
-from SuperRes.predict import Predictor as sr_predictor
-from Deblur.predict import Predictor as db_predictor
 from streamlit_cropper import st_cropper
-
 
 def main():
   st.title("종합 이미지 보정 도구 ")
