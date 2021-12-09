@@ -5,9 +5,11 @@
 * [Deblur](https://github.com/jiangsutx/SRN-Deblur)
 
 ### 실행 방법
-1. ```python main.py --port=6006``` 실행 (열린 port번호 지정) 
-2. 실행 후 나타나는 링크 복사
-3. 링크에서 port만 변경해서 접속 (필요시에만 변경)(ex:6006->6014)
+1. Fast API 사용할 경우 ```python router.py``` 실행
+2. Fast API 사용하지 않을 경우 app.py 에서 'Fast API 추론' 부분을 주석처리하고 '기존 함수 추론' 부분을 주석해제.
+3. ```python main.py --port=6006``` 실행 (열린 port번호 지정) 
+4. 실행 후 나타나는 링크 복사
+5. 링크에서 port만 변경해서 접속 (필요시에만 변경)(ex:6006->6014)
 
 ### Super Resolution weight file 다운로드 방법
 > SuperRes/weights/ 폴더와  Deblur/weights/color,gray,lstm/ 폴더에 weight를 다운로드합니다.
