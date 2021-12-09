@@ -13,6 +13,8 @@ import base64
 import requests
 from SuperRes.predict import Predictor as sr_predictor
 from Deblur.predict import Predictor as db_predictor
+from streamlit_cropper import st_cropper
+
 
 def main():
   st.title("종합 이미지 보정 도구 ")
@@ -26,10 +28,6 @@ def main():
 
   #파일 선택
   uploaded_file = st.sidebar.file_uploader("Choose an image...", type="jpg",key="SR")
-  if uploaded_file is not None:
-    image = Image.open(uploaded_file)
-    st.image(image, caption='Original Image', use_column_width=True)
-    st.write("")
   
   #모듈 실행
   ### Image Completion ###
@@ -41,28 +39,49 @@ def main():
   elif choice=='Super Resolution':
     ratio_list = ['2','3','4','8']
     ratio = st.sidebar.selectbox('이미지 확대 비율 선택',ratio_list)
-    #TODO: image crop, resize scale 선택
-    #TODO: sidebar에서 선택한 args 넘겨주기
-    if st.sidebar.button('결과 보기'):
-      with st.spinner('Processing...'):
-        files = {'files':uploaded_file.getvalue()}
-        response = requests.post('http://127.0.0.1:8000/super',files=files) #TODO: change into server addr
-        bytes_data = io.BytesIO(response.content)
-        new_image = Image.open(bytes_data)
-      st.success('Done!')
-      st.image(new_image, caption='Processed Image', use_column_width=True)
+
+    if uploaded_file is not None:
+      image = Image.open(uploaded_file)
+      st.image(image, caption='Original Image', use_column_width=True)
+      st.write("")
+
+      # TODO: image crop canvas 수정필요
+      cropped_img = st_cropper(image, aspect_ratio=None)
+
+      #TODO: resize scale 선택
+      #TODO: sidebar에서 선택한 args 넘겨주기
+      if st.sidebar.button('결과 보기'):
+        with st.spinner('Processing...'):
+          # https://stackoverflow.com/questions/33101935/convert-pil-image-to-byte-array
+          # TODO: 모듈화 된 함수 이용
+          img_byte_arr = io.BytesIO()
+          cropped_img.save(img_byte_arr, format='PNG')
+          img_byte_arr = img_byte_arr.getvalue()
+          files = {'files':img_byte_arr}
+          response = requests.post('http://127.0.0.1:8000/super',files=files) #TODO: change into server addr
+          bytes_data = io.BytesIO(response.content)
+          new_image = Image.open(bytes_data)
+        st.success('Done!')
+        col1, col2 = st.columns(2)
+        col1.image(cropped_img, caption='Cropped Image', use_column_width=True)
+        col2.image(new_image, caption='Processed Image', use_column_width=True)
   
   ### Deblur ###
   elif choice=='Deblur':
-    #TODO: image crop
-    if st.sidebar.button('결과 보기'):
-      with st.spinner('Processing...'):
-        files = {'files':uploaded_file.getvalue()}
-        response = requests.post('http://127.0.0.1:8000/deblur',files=files) #TODO: change into server addr
-        bytes_data = io.BytesIO(response.content)
-        new_image = Image.open(bytes_data)
-      st.success('Done!')
-      st.image(new_image, caption='Processed Image', use_column_width=True)
+    if uploaded_file is not None:
+      image = Image.open(uploaded_file)
+      st.image(image, caption='Original Image', use_column_width=True)
+      st.write("")
+
+      #TODO: image crop
+      if st.sidebar.button('결과 보기'):
+        with st.spinner('Processing...'):
+          files = {'files':uploaded_file.getvalue()}
+          response = requests.post('http://127.0.0.1:8000/deblur',files=files) #TODO: change into server addr
+          bytes_data = io.BytesIO(response.content)
+          new_image = Image.open(bytes_data)
+        st.success('Done!')
+        st.image(new_image, caption='Processed Image', use_column_width=True)
 
 if __name__ == '__main__':
 	main()
