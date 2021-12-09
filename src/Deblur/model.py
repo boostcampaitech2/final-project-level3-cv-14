@@ -22,7 +22,8 @@ class DEBLUR(object):
         self.train_dir = os.path.join(BASE_DIR, args.model)
         if not os.path.exists(self.train_dir):
             os.makedirs(self.train_dir)
-
+        tf.reset_default_graph() 
+        
     def generator(self, inputs, reuse=False, scope='g_net'):
         n, h, w, c = inputs.get_shape().as_list()
 
