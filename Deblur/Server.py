@@ -3,10 +3,10 @@ from starlette.responses import StreamingResponse
 import uvicorn
 from PIL import Image
 import io
-from Wrapper import Predictor
+from Wrapper import Deblur
 
 app = FastAPI()
-db_predictor = Predictor()
+db_predictor = Deblur()
 
 @app.post('/deblur')
 async def predict_deblur(files:UploadFile=File(...)):
