@@ -1,3 +1,9 @@
+[submodule "SwinIR"]
+	path = SuperResolution/SwinIR
+	url = https://github.com/JingyunLiang/SwinIR.git
+[submodule "SRN-Deblur"]
+	path = Deblur/SRNDeblur
+	url = https://github.com/jiangsutx/SRN-Deblur.git
 [submodule "Inpainting/lama"]
 	path = Inpainting/lama
 	url = https://github.com/saic-mdal/lama.git
