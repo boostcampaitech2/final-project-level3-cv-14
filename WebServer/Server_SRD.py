@@ -17,7 +17,7 @@ sys.path.append(os.getcwd())
 from Utils import ImageEncoder
 
 def main():
-  st.title("종합 이미지 보정 도구 ")
+  #st.title("종합 이미지 보정 도구 ")
   st.sidebar.header('Choose Options')
 
   #module 선택
@@ -47,13 +47,14 @@ def main():
       # TODO: image crop canvas 수정필요
       cropped_img = st_cropper(image, aspect_ratio=None)
 
-      #TODO: resize scale 선택
-      #TODO: sidebar에서 선택한 args 넘겨주기
       if st.sidebar.button('결과 보기'):
         with st.spinner('Processing...'):
           image = np.array(cropped_img.convert('RGB'))
           img_byte_arr = ImageEncoder.Encode(image, ext='jpg', quality=90)
-          files = {'files':img_byte_arr}
+          files = {
+            'image': img_byte_arr,
+            'ratio': (None, int(ratio)),
+          }
           response = requests.post('http://127.0.0.1:8000/super',files=files) #TODO: change into server addr
         if response.status_code==200:
           new_image = ImageEncoder.Decode(response.content)
