@@ -11,5 +11,5 @@ CV 14조 final project
 2. port만 변경해서 접속 (ex:6006->6014)
 
 ### weight file 다운로드
-1. Super Resolution: ```bash SuperResolution/SwinIR/download-weights.sh```
+1. Super Resolution: ```bash SuperResolution/download-weights.sh```
 2. Deblur: ```bash Deblur/SRNDeblur/checkpoints/download_model.sh```

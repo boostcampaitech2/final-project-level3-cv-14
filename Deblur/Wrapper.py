@@ -15,7 +15,6 @@ class Deblur():
     def __init__(self):
         self.args = parse_args()
         file = open(self.args.datalist, 'w')
-        file.truncate(0)
         file.close()
 
     def predict(self,image):
