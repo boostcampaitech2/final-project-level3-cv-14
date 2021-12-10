@@ -38,7 +38,7 @@ def main():
   ### Super Resolution ###
   elif choice=='Super Resolution':
     ratio_list = ['2','3','4','8']
-    ratio = st.sidebar.selectbox('이미지 확대 비율 선택',ratio_list)
+    ratio = st.sidebar.selectbox('이미지 확대 비율 선택',ratio_list,index=2)
 
     if uploaded_file is not None:
       image = Image.open(uploaded_file)
@@ -75,7 +75,7 @@ def main():
       #TODO: image crop
       if st.sidebar.button('결과 보기'):
         with st.spinner('Processing...'):
-          files = {'files':uploaded_file.getvalue()}
+          files = {'image':uploaded_file.getvalue()}
           response = requests.post('http://127.0.0.1:8000/deblur',files=files) #TODO: change into server addr
         if response.status_code==200:
           bytes_data = io.BytesIO(response.content)
