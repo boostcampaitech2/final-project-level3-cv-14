@@ -14,6 +14,7 @@ import requests
 import sys
 sys.path.append(os.getcwd())
 from Utils import ImageEncoder
+from utils import load_img
 
 def main():
   st.set_page_config(layout="wide")
@@ -41,7 +42,7 @@ def main():
     ratio = st.sidebar.selectbox('이미지 확대 비율 선택',ratio_list)
 
     if uploaded_file is not None:
-      image = Image.open(uploaded_file)
+      image = load_img(uploaded_file)
       st.write("")
 
       w = st.sidebar.slider("width", 0, image.width, (0, image.width))
@@ -76,7 +77,7 @@ def main():
   ### Deblur ###
   elif choice=='Deblur':
     if uploaded_file is not None:
-      image = Image.open(uploaded_file)
+      image = load_img(uploaded_file)
       st.image(image, caption='Original Image', use_column_width=True)
       st.write("")
 
