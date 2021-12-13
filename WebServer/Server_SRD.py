@@ -19,7 +19,7 @@ import copy
 
 sys.path.append(os.getcwd())
 from Utils import ImageEncoder
-from SuperResolution.utils import load_img
+from WebServer.utils import load_img
 
 
 def main():
