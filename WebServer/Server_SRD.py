@@ -113,7 +113,7 @@ def main():
             # TODO: test
             if st.sidebar.button('결과 보기'):
                 with st.spinner('Processing...'):
-                    files = {'files': uploaded_file.getvalue()}
+                    files = {'image': uploaded_file.getvalue()}
                     response = requests.post('http://127.0.0.1:8000/deblur',
                                              files=files)  # TODO: change into server addr
                 if response.status_code == 200:
@@ -126,7 +126,7 @@ def main():
                     
             elif st.sidebar.button('선택 영역 결과 보기'):
                 with st.spinner('Processing...'):
-                        files = {'files': masked}
+                        files = {'image': masked}
                         response = requests.post('http://127.0.0.1:8000/deblur',
                                                  files=files)  # TODO: change into server addr
                 if response.status_code == 200:
