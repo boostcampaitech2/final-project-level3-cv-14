@@ -86,17 +86,31 @@ def main():
             st.write("")
             
             canvas_result = st_canvas(
-            fill_color="rgba(255, 165, 0, 0.3)",  # Fixed fill color with some opacity
-            stroke_width=1, # drawing 두께
-            background_color="#eee", # 캔버스 바탕 색
-            background_image=Image.open(uploaded_file) if uploaded_file else None, #Pillow image to display behind canvas
-            update_streamlit=True,
-            height = int(Image.open(uploaded_file).size[1]),
-            width = int(Image.open(uploaded_file).size[0]),
-            drawing_mode="rect",
+                fill_color="rgba(255, 165, 0, 0.3)",  # Fixed fill color with some opacity
+                stroke_width=1, # drawing 두께
+                background_color="#eee", # 캔버스 바탕 색
+                background_image = image, #Pillow image to display behind canvas
+                update_streamlit=True,
+                height = int(image.size[1]),
+                width = int(image.size[0]),
+                drawing_mode="rect",
             )
-            
-            if canvas_result.json_data is not None and uploaded_file is not None: #edit
+
+            # TODO: test
+            if st.sidebar.button('결과 보기'):
+                with st.spinner('Processing...'):
+                    image = np.array(image.convert('RGB'))
+                    img_byte_arr = ImageEncoder.Encode(image, ext='jpg', quality=90)
+                    files = {'image': img_byte_arr}
+                    response = requests.post('http://127.0.0.1:8000/deblur',files=files)  # TODO: change into server addr
+                if response.status_code == 200:
+                    new_image = ImageEncoder.Decode(response.content)
+                    st.success('Done!')
+                    st.image(new_image, caption='Processed Image', use_column_width=True)
+                else:
+                    st.error('Error Status Code:{}'.format(response.status_code))
+
+            if canvas_result.json_data is not None: #edit
                 height = image.size[1]
                 width = image.size[0]
                 image = np.array(image)
@@ -107,37 +121,21 @@ def main():
                     x1,y1,x2,y2 = ob['left'], ob['top'], ob['left'] + ob['width'], ob['top'] + ob['height']
                     cv2.rectangle(img, (x1, y1), (x2, y2), (0), -1)
                     cv2.rectangle(mask, (x1, y1), (x2, y2), (0), -1)   
-
                     masked = cv2.bitwise_xor(image, img)
 
-            # TODO: test
-            if st.sidebar.button('결과 보기'):
-                with st.spinner('Processing...'):
-                    files = {'image': uploaded_file.getvalue()}
-                    response = requests.post('http://127.0.0.1:8000/deblur',
-                                             files=files)  # TODO: change into server addr
-                if response.status_code == 200:
-                    bytes_data = io.BytesIO(response.content)
-                    new_image = Image.open(bytes_data)
-                    st.success('Done!')
-                    st.image(new_image, caption='Processed Image', use_column_width=True)
-                else:
-                    st.error('Error Status Code:{}'.format(response.status_code))
-                    
-            elif st.sidebar.button('선택 영역 결과 보기'):
-                with st.spinner('Processing...'):
-                        files = {'image': masked}
-                        response = requests.post('http://127.0.0.1:8000/deblur',
-                                                 files=files)  # TODO: change into server addr
-                if response.status_code == 200:
-                    transformed_masked = np.where(masked, response, 0)
-                    transformed_image = img + transformed_masked
-                    bytes_data = io.BytesIO(transformed_image.content)
-                    new_image = Image.open(bytes_data)
-                    st.success('Done!')
-                    st.image(new_image, caption='Processed Image', use_column_width=True)
-                else:
-                    st.error('Error Status Code:{}'.format(response.status_code))
+                if st.sidebar.button('선택 영역 결과 보기'):
+                    with st.spinner('Processing...'):
+                        masked_byte_arr = ImageEncoder.Encode(masked, ext='jpg', quality=90)
+                        files = {'image': masked_byte_arr }
+                        response = requests.post('http://127.0.0.1:8000/deblur',files=files)  # TODO: change into server addr
+                    if response.status_code == 200:
+                        response_arr = ImageEncoder.Decode(response.content)
+                        transformed_masked = np.where(masked, response_arr, 0)
+                        new_image = img + transformed_masked
+                        st.success('Done!')
+                        st.image(new_image, caption='Processed Image', use_column_width=True)
+                    else:
+                        st.error('Error Status Code:{}'.format(response.status_code))
 
 if __name__ == '__main__':
     main()
