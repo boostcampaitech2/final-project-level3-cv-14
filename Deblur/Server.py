@@ -1,25 +1,24 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, Response, UploadFile, File
 from starlette.responses import StreamingResponse
 import uvicorn
 from PIL import Image
 import io
+import sys
+import os
+sys.path.append(os.path.join(os.getcwd(), '../Utils'))
+ImageEncoder = __import__("ImageEncoder")
 from Wrapper import Deblur
 
 app = FastAPI()
 db_predictor = Deblur()
 
 @app.post('/deblur')
-async def predict_deblur(files:UploadFile=File(...)):
-    image_bytes = await files.read()
-    image = Image.open(io.BytesIO(image_bytes))
+async def predict_deblur(image:UploadFile=File(...)):
+    image_bytes = await image.read()
+    image = ImageEncoder.Decode(image_bytes, channels=3)
     new_image = db_predictor.predict(image)
-    new_image = Image.fromarray(new_image.astype('uint8'), 'RGB')
-
-    img_byte = io.BytesIO()
-    new_image.save(img_byte,"JPEG")
-    img_byte.seek(0)
-
-    return StreamingResponse(img_byte,media_type="image/jpeg")
+    img_byte = ImageEncoder.Encode(new_image)
+    return Response(content=img_byte)
 
 if __name__ == "__main__":
     uvicorn.run(app="Server:app",
