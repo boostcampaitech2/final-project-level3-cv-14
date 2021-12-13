@@ -11,17 +11,19 @@ import streamlit as st
 import io
 import base64
 import requests
-from streamlit_cropper import st_cropper
+
 from streamlit_drawable_canvas import st_canvas
+
 import sys
 import copy
 
 sys.path.append(os.getcwd())
 from Utils import ImageEncoder
+from SuperResolution.utils import load_img
 
 
 def main():
-    # st.title("종합 이미지 보정 도구 ")
+    st.set_page_config(layout="wide")
     st.sidebar.header('Choose Options')
 
     # module 선택
@@ -45,14 +47,21 @@ def main():
         ratio = st.sidebar.selectbox('이미지 확대 비율 선택', ratio_list)
 
         if uploaded_file is not None:
-            image = Image.open(uploaded_file)
+            image = load_img(uploaded_file)
             st.write("")
 
-            # TODO: image crop canvas 수정필요
-            cropped_img = st_cropper(image, aspect_ratio=None)
+            w = st.sidebar.slider("width", 0, image.width, (0, image.width))
+            h = st.sidebar.slider("height", 0, image.height, (0, image.height))
+
+            bg = np.zeros_like(image)
+            bg[h[0]:h[1], w[0]:w[1]] = 255
+            bg = Image.fromarray(bg)
+            blended = Image.blend(image, bg, alpha = 0.3)
+            st.image(blended, caption='Original Image', use_column_width=True)
 
             if st.sidebar.button('결과 보기'):
                 with st.spinner('Processing...'):
+                    cropped_img = image.crop((w[0], h[0], w[1], h[1]))
                     image = np.array(cropped_img.convert('RGB'))
                     img_byte_arr = ImageEncoder.Encode(image, ext='jpg', quality=90)
                     files = {
@@ -73,7 +82,7 @@ def main():
     ### Deblur ###
     elif choice == 'Deblur':
         if uploaded_file is not None:
-            image = Image.open(uploaded_file)
+            image = load_img(uploaded_file)
             st.write("")
             
             canvas_result = st_canvas(
