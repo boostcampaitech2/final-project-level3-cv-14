@@ -10,6 +10,7 @@ import streamlit as st
 from streamlit_drawable_canvas import st_canvas
 import PIL.Image as Image
 import requests
+print(os.path.dirname(os.path.abspath(__file__)))
 from Utils import ImageEncoder
 
 #sys.path.append(os.path.join(os.getcwd(), '../Utils'))
