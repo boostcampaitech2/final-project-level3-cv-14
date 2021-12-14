@@ -4,3 +4,4 @@ uvicorn
 streamlit_drawable_canvas
 python-multipart
 opencv-python
+opencv_contrib_python
