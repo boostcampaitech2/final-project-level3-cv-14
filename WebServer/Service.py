@@ -10,11 +10,8 @@ import streamlit as st
 from streamlit_drawable_canvas import st_canvas
 import PIL.Image as Image
 import requests
-print(os.path.dirname(os.path.abspath(__file__)))
-from Utils import ImageEncoder
-
-#sys.path.append(os.path.join(os.getcwd(), '../Utils'))
-#ImageEncoder = __import__("ImageEncoder")
+sys.path.append(os.path.join(os.getcwd(), 'Utils'))
+ImageEncoder = __import__("ImageEncoder")
 
 # Specify canvas parameters in application
 stroke_width = st.sidebar.slider("Stroke width: ", 1, 50, 35)
