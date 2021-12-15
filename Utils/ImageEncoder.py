@@ -25,6 +25,6 @@ def Decode(image_bytes, channels=3):
     elif channels==1:
         color = cv2.IMREAD_GRAYSCALE
 
-    image_serial = np.fromstring(image_bytes, np.uint8)
+    image_serial = np.frombuffer(image_bytes, np.uint8)
     image = cv2.imdecode(image_serial, color)
     return image

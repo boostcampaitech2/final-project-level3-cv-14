@@ -69,8 +69,7 @@ if choice == 'Inpainting':
         mask_bytes = ImageEncoder.Encode(mask, ext='png')
 
         response = requests.post('http://jiseong.iptime.org:8786/inference/', files={'image': image_bytes, 'mask': mask_bytes})
-        image_inpaint = np.fromstring(response.content, np.uint8)
-        result = cv2.imdecode(image_inpaint, cv2.IMREAD_COLOR)
+        result = ImageEncoder.Decode(response.content)
         st.image(result, use_column_width=True)
 
 elif choice == 'Super Resolution':
