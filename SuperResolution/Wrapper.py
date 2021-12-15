@@ -29,6 +29,14 @@ class SuperResolution():
         args.folder_gt = None
         args.folder_lq = None
         args.large_model = None
+        
+        args.task = 'classical_sr'
+        args.noise = 15
+        args.jpeg = 40
+        args.training_patch_size = 64
+        args.scale = 2
+        args.model_path = self.model_zoo[args.task][args.scale]
+
         self.args = args
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.tasks = {
@@ -38,22 +46,22 @@ class SuperResolution():
             'JPEG Compression Artifact Reduction': 'jpeg_car'
         }
 
+        self.model = define_model(self.args).to(self.device).eval()
+
     @st.cache
     def predict(self, image, task_type='Real-World Image Super-Resolution', jpeg=40, noise=15,scale=4):
-        self.args.task = 'classical_sr'
-        self.args.noise = noise
-        self.args.jpeg = jpeg
-        self.args.training_patch_size = 64
-        self.args.scale = scale
 
-        if self.args.scale == 4:
-            self.args.task = 'real_sr'
-            self.args.training_patch_size = 128
-        self.args.model_path = self.model_zoo[self.args.task][self.args.scale]
-
-        model = define_model(self.args)
-        model.eval()
-        model = model.to(self.device)
+        if self.args.scale != scale:
+            self.args.scale = scale
+            if scale == 4:
+                self.args.task = 'real_sr'
+                self.args.training_patch_size = 128
+                self.args.model_path = self.model_zoo[self.args.task][self.args.scale]
+            else:
+                self.args.task = 'classical_sr'
+                self.args.training_patch_size = 64
+                self.args.model_path = self.model_zoo[self.args.task][self.args.scale]
+            self.model = define_model(self.args).to(self.device).eval()
 
         # setup folder and path
         _, _, border, window_size = setup(self.args)
@@ -72,7 +80,7 @@ class SuperResolution():
             w_pad = (w_old // window_size + 1) * window_size - w_old
             img_gt = torch.cat([img_gt, torch.flip(img_gt, [2])], 2)[:, :, :h_old + h_pad, :]
             img_gt = torch.cat([img_gt, torch.flip(img_gt, [3])], 3)[:, :, :, :w_old + w_pad]
-            output = model(img_gt)
+            output = self.model(img_gt)
             output = output[..., :h_old * 4, :w_old * 4]
         output = output.data.squeeze().float().cpu().clamp_(0, 1).numpy()
         if output.ndim == 3:
