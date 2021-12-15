@@ -22,6 +22,6 @@ async def predict_super(image:UploadFile=File(...),ratio:int=Form(...)):
 if __name__ == "__main__":
     uvicorn.run(app="Server:app",
                 host="0.0.0.0",
-                port=8000, #TODO: change into remote server port
+                port=6006,
                 reload=True,
                 workers=4)
