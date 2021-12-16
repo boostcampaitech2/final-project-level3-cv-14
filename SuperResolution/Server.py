@@ -8,16 +8,24 @@ sys.path.append(os.path.join(os.getcwd(), '../Utils'))
 ImageEncoder = __import__("ImageEncoder")
 from Wrapper import SuperResolution
 
+
 app = FastAPI()
 sr_predictor = SuperResolution()
 
+
+@app.post('/scale')
+async def change_scale(scale:int=Form(...)):
+    sr_predictor.change_scale(scale)
+
+
 @app.post('/super')
-async def predict_super(image:UploadFile=File(...),ratio:int=Form(...)):
+async def predict_super(image:UploadFile=File(...), scale:int=Form(...)):
     image_bytes = await image.read()
     image = ImageEncoder.Decode(image_bytes, channels=3)
-    new_image = sr_predictor.predict(image,scale=ratio)
+    new_image = sr_predictor.predict(image, scale=scale)
     img_byte = ImageEncoder.Encode(new_image)
     return Response(content=img_byte)
+
 
 if __name__ == "__main__":
     uvicorn.run(app="Server:app",
