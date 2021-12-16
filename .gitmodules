@@ -7,3 +7,6 @@
 [submodule "Inpainting/lama"]
 	path = Inpainting/lama
 	url = https://github.com/saic-mdal/lama.git
+[submodule "MPRNet"]
+	path = MPRNet
+	url = https://github.com/swz30/MPRNet.git
