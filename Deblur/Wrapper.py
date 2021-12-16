@@ -13,18 +13,19 @@ import streamlit as st
 import sys
 from runpy import run_path
 from PIL import Image
-sys.path.append(os.path.join(os.getcwd(),'MPRNet'))
+
 
 class Deblur():
     def __init__(self):
         
-        task = "Deblurring"
+        sys.path.append(os.path.join(os.getcwd(),'MPRNet'))
+        task = sys.path[-1] + '/' + "Deblurring"
         
         load_file = run_path(os.path.join(task, "MPRNet.py"))
         self.model = load_file['MPRNet']()
         self.model.cuda()
 
-        weights = os.path.join(task, "pretrained_models", "model_"+task.lower()+".pth")
+        weights = os.path.join(task, "pretrained_models", "model_deblurring.pth")
         checkpoint = torch.load(weights)
         try:
             self.model.load_state_dict(checkpoint["state_dict"])
