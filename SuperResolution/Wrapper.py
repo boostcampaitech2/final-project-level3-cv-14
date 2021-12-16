@@ -48,9 +48,7 @@ class SuperResolution():
 
         self.model = define_model(self.args).to(self.device).eval()
 
-    @st.cache
-    def predict(self, image, task_type='Real-World Image Super-Resolution', jpeg=40, noise=15,scale=4):
-
+    def change_scale(self, scale):
         if self.args.scale != scale:
             self.args.scale = scale
             if scale == 4:
@@ -62,6 +60,12 @@ class SuperResolution():
                 self.args.training_patch_size = 64
                 self.args.model_path = self.model_zoo[self.args.task][self.args.scale]
             self.model = define_model(self.args).to(self.device).eval()
+        
+        
+    @st.cache
+    def predict(self, image, task_type='Real-World Image Super-Resolution', jpeg=40, noise=15,scale=4):
+        if self.args.scale != scale:
+            self.change_scale(scale)
 
         # setup folder and path
         _, _, border, window_size = setup(self.args)
