@@ -1,74 +1,32 @@
 import os
-import argparse
-import tensorflow as tf
 import torch
 import numpy as np
 import streamlit as st
 import cv2
 import sys
 sys.path.append(os.path.join(os.getcwd(),'SwinIR'))
-from SwinIR.main_test_swinir import define_model, setup, get_image_pair
+from SwinIR.models.network_swinir import SwinIR as net
+
 
 class SuperResolution():
     def __init__(self):
-        model_dir = os.path.join(os.getcwd(),'SwinIR/experiments/pretrained_models')
-
-        self.model_zoo = {
-            'real_sr': {
-                4: os.path.join(model_dir, '003_realSR_BSRGAN_DFO_s64w8_SwinIR-M_x4_GAN.pth')
-            },
-            'classical_sr':{
-                2: os.path.join(model_dir, '001_classicalSR_DF2K_s64w8_SwinIR-M_x2.pth'),
-                3: os.path.join(model_dir, '001_classicalSR_DF2K_s64w8_SwinIR-M_x3.pth'),
-                4: os.path.join(model_dir, '001_classicalSR_DF2K_s64w8_SwinIR-M_x4.pth'),
-                8: os.path.join(model_dir, '001_classicalSR_DF2K_s64w8_SwinIR-M_x8.pth'),
-            }
-        }
+        model_path = os.path.join(os.getcwd(),'SwinIR/experiments/pretrained_models/003_realSR_BSRGAN_DFO_s64w8_SwinIR-M_x4_GAN.pth')
  
-        args = argparse.Namespace()
-        args.folder_gt = None
-        args.folder_lq = None
-        args.large_model = None
-        
-        args.task = 'classical_sr'
-        args.noise = 15
-        args.jpeg = 40
-        args.training_patch_size = 64
-        args.scale = 2
-        args.model_path = self.model_zoo[args.task][args.scale]
+        self.model = net(upscale=4, in_chans=3, img_size=64, window_size=8,
+                        img_range=1., depths=[6, 6, 6, 6, 6, 6], embed_dim=180, num_heads=[6, 6, 6, 6, 6, 6],
+                        mlp_ratio=2, upsampler='nearest+conv', resi_connection='1conv')
 
-        self.args = args
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.tasks = {
-            'Real-World Image Super-Resolution': 'real_sr',
-            'Grayscale Image Denoising': 'gray_dn',
-            'Color Image Denoising': 'color_dn',
-            'JPEG Compression Artifact Reduction': 'jpeg_car'
-        }
 
-        self.model = define_model(self.args).to(self.device).eval()
+        pretrained_model = torch.load(model_path)
+        self.model.load_state_dict(pretrained_model['params_ema'] if 'params_ema' in pretrained_model.keys() else pretrained_model, strict=True)
+        self.model.to(self.device).eval()
 
-    def change_scale(self, scale):
-        if self.args.scale != scale:
-            self.args.scale = scale
-            if scale == 4:
-                self.args.task = 'real_sr'
-                self.args.training_patch_size = 128
-                self.args.model_path = self.model_zoo[self.args.task][self.args.scale]
-            else:
-                self.args.task = 'classical_sr'
-                self.args.training_patch_size = 64
-                self.args.model_path = self.model_zoo[self.args.task][self.args.scale]
-            self.model = define_model(self.args).to(self.device).eval()
-        
-        
+
     @st.cache
-    def predict(self, image, task_type='Real-World Image Super-Resolution', jpeg=40, noise=15,scale=4):
-        if self.args.scale != scale:
-            self.change_scale(scale)
-
-        # setup folder and path
-        _, _, border, window_size = setup(self.args)
+    def predict(self, image):
+        # setup window_size
+        window_size = 8
         
         # read image
         img_gt = cv2.cvtColor(image, cv2.IMREAD_COLOR).astype(np.float32) / 255. # image to HWC-BGR, float32

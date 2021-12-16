@@ -1,7 +1,5 @@
-from fastapi import FastAPI, UploadFile, File, Response, Form
+from fastapi import FastAPI, UploadFile, File, Response
 import uvicorn
-from PIL import Image
-import io
 import sys
 import os
 sys.path.append(os.path.join(os.getcwd(), '../Utils'))
@@ -13,16 +11,11 @@ app = FastAPI()
 sr_predictor = SuperResolution()
 
 
-@app.post('/scale')
-async def change_scale(scale:int=Form(...)):
-    sr_predictor.change_scale(scale)
-
-
 @app.post('/super')
-async def predict_super(image:UploadFile=File(...), scale:int=Form(...)):
+async def predict_super(image:UploadFile=File(...)):
     image_bytes = await image.read()
     image = ImageEncoder.Decode(image_bytes, channels=3)
-    new_image = sr_predictor.predict(image, scale=scale)
+    new_image = sr_predictor.predict(image)
     img_byte = ImageEncoder.Encode(new_image)
     return Response(content=img_byte)
 
