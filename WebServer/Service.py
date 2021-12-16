@@ -73,8 +73,9 @@ if choice == 'Inpainting':
         st.image(result, use_column_width=True)
 
 elif choice == 'Super Resolution':
-    ratio_list = ['2', '3', '4', '8']
-    ratio = st.sidebar.selectbox('이미지 확대 비율 선택', ratio_list)
+    scale_list = ['2', '3', '4', '8']
+    scale = st.sidebar.selectbox('이미지 확대 비율 선택', scale_list)
+    requests.post('http://118.67.132.41:6014/scale', data={'scale': int(scale)})
 
     st.write("")
 
@@ -94,9 +95,9 @@ elif choice == 'Super Resolution':
             img_byte_arr = ImageEncoder.Encode(image, ext='jpg', quality=90)
             files = {
                 'image': img_byte_arr,
-                'ratio': (None, int(ratio)),
+                'scale': (None, int(scale)),
             }
-            response = requests.post('http://jiseong.iptime.org:8890/super', files=files)  # TODO: change into server addr
+            response = requests.post('http://118.67.132.41:6014/super', files=files)
         if response.status_code == 200:
             new_image = ImageEncoder.Decode(response.content)
             st.success('Done!')
