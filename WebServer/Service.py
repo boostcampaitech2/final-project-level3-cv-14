@@ -177,7 +177,7 @@ def main():
         tool = "freedraw"
         stroke_width = st.slider("Stroke width: ", 1, 50, 35)
 
-    elif drawing_mode == "rect":
+    elif drawing_mode == "Rect":
         tool = "rect"
         stroke_width = 1
 
