@@ -21,4 +21,4 @@ jobs:
         key: ${{ secrets.SSH_KEY_JSH }}
         port: ${{ secrets.SSH_PORT_JSH }}
         script: |
-            ls
+            git pull origin main
