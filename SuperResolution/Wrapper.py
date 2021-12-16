@@ -1,6 +1,5 @@
 import os
 import argparse
-import tensorflow as tf
 import torch
 import numpy as np
 import streamlit as st

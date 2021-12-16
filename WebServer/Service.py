@@ -169,8 +169,6 @@ def main():
         st.session_state["history"].append(st.session_state["image_current"])
         st.session_state["history_idx"] = len(st.session_state["history"]) - 1
 
-    print("현재 인덱스", st.session_state["history_idx"])
-
     # 그리기 도구
     drawing_mode = st.selectbox("그리기 도구:", ["Free Draw", "Rect", "Inpainting 영역 추천"])
     if drawing_mode == "Free Draw":

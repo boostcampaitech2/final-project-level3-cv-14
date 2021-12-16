@@ -1,7 +1,5 @@
 from fastapi import FastAPI, UploadFile, File, Response, Form
 import uvicorn
-from PIL import Image
-import io
 import sys
 import os
 sys.path.append(os.path.join(os.getcwd(), '../Utils'))
