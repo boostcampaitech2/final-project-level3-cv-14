@@ -10,3 +10,6 @@
 [submodule "MPRNet"]
 	path = MPRNet
 	url = https://github.com/swz30/MPRNet.git
+[submodule "Deblur/MPRNet"]
+	path = Deblur/MPRNet
+	url = https://github.com/swz30/MPRNet.git
