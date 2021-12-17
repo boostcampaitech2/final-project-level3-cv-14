@@ -231,6 +231,7 @@ def main():
     if st.button("평가하기"):
         # TODO: 별점, 어떤 inference인지 DB에 저장
         pass
+    
 
 if __name__ == "__main__":
     main()
