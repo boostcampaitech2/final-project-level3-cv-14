@@ -20,6 +20,6 @@ async def predict_deblur(image:UploadFile=File(...)):
 if __name__ == "__main__":
     uvicorn.run(app="Server:app",
                 host="0.0.0.0",
-                port=8000,
+                port=8789,
                 reload=True,
                 workers=4)

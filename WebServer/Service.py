@@ -110,7 +110,7 @@ def main():
         mask_background = np.array(st.session_state["mask"]==0,dtype=np.uint8)
 
         image_bytes = ImageEncoder.Encode(st.session_state["image_current"], ext='jpg', quality=90)
-        response = requests.post('http://jiseong.iptime.org:8890/super', files={'image': image_bytes, 'ratio': (None, 4)})
+        response = requests.post('http://jiseong.iptime.org:8788/super', files={'image': image_bytes})
         result = ImageEncoder.Decode(response.content)
 
         image_quarter = cv2.resize(st.session_state["image_current"], dsize=(0,0), fx=4, fy=4)
@@ -130,7 +130,7 @@ def main():
         mask_background = np.array(st.session_state["mask"]==0,dtype=np.uint8)
 
         image_bytes = ImageEncoder.Encode(st.session_state["image_current"], ext='jpg', quality=90)
-        response = requests.post('http://jiseong.iptime.org:8891/deblur', files={'image': image_bytes})  # TODO: change into server addr
+        response = requests.post('http://jiseong.iptime.org:8789/deblur', files={'image': image_bytes})  # TODO: change into server addr
         result = ImageEncoder.Decode(response.content)
 
         image_front = cv2.bitwise_and(result, result, mask=mask_front)
@@ -170,7 +170,7 @@ def main():
         st.session_state["history_idx"] = len(st.session_state["history"]) - 1
 
     # 그리기 도구
-    drawing_mode = st.selectbox("그리기 도구:", ["Free Draw", "Rect", "Inpainting 영역 추천"])
+    drawing_mode = st.selectbox("그리기 도구:", ["Rect", "Free Draw", "Inpainting 영역 추천"])
     if drawing_mode == "Free Draw":
         tool = "freedraw"
         stroke_width = st.slider("Stroke width: ", 1, 50, 35)
@@ -183,8 +183,13 @@ def main():
         tool = "freedraw"
         stroke_width = 1
 
+    if drawing_mode == "Inpainting 영역 추천":
+        image_view = ''
+    else:
+        image_view = st.session_state["image_current"]
+
     # 캔버스에 보여줄 이미지 * 배율
-    image_view = cv2.resize(st.session_state["image_current"], dsize=(0, 0), fx=magnification, fy=magnification)
+    image_view = cv2.resize(image_view, dsize=(0, 0), fx=magnification, fy=magnification)
 
     # 캔버스 (이미지 업데이트를 위해 가장 마지막에 위치)
     h,w = image_view.shape[:2]
@@ -203,17 +208,20 @@ def main():
     # 마스크 생성
     flag_draw = drawing_objects.json_data is not None and drawing_objects.json_data["objects"]  # draw 내용 유무
     if flag_draw:
-        mask = np.zeros((h, w), np.uint8)
-        for ob in drawing_objects.json_data["objects"]:
-            if ob['type'] == 'rect':
-                x1, y1, x2, y2 = ob['left'], ob['top'], ob['left'] + ob['width'], ob['top'] + ob['height']
-                mask = cv2.rectangle(mask, (x1, y1), (x2, y2), (1), cv2.FILLED)
-            if ob['type'] == 'path':
-                for dot in ob['path']:
-                    if dot[0] != 'Q':
-                        continue
-                    x1, y1, x2, y2 = map(int, dot[1:])
-                    mask = cv2.line(mask, (x1, y1), (x2, y2), (1), stroke_width)
+        if drawing_mode in ["Free Draw", "Rect"]:
+            mask = np.zeros((h, w), np.uint8)
+            for ob in drawing_objects.json_data["objects"]:
+                if ob['type'] == 'rect':
+                    x1, y1, x2, y2 = ob['left'], ob['top'], ob['left'] + ob['width'], ob['top'] + ob['height']
+                    mask = cv2.rectangle(mask, (x1, y1), (x2, y2), (1), cv2.FILLED)
+                if ob['type'] == 'path':
+                    for dot in ob['path']:
+                        if dot[0] != 'Q':
+                            continue
+                        x1, y1, x2, y2 = map(int, dot[1:])
+                        mask = cv2.line(mask, (x1, y1), (x2, y2), (1), stroke_width)
+        elif drawing_mode == "Inpainting 영역 추천":
+            ''
 
         h,w = st.session_state["image_current"].shape[:2]
         st.session_state["mask"] = cv2.resize(mask, dsize=(w,h))
@@ -231,7 +239,7 @@ def main():
     if st.button("평가하기"):
         # TODO: 별점, 어떤 inference인지 DB에 저장
         pass
-    
+
 
 if __name__ == "__main__":
     main()

@@ -23,6 +23,6 @@ async def predict_super(image:UploadFile=File(...)):
 if __name__ == "__main__":
     uvicorn.run(app="Server:app",
                 host="0.0.0.0",
-                port=6006,
+                port=8788,
                 reload=True,
                 workers=4)
