@@ -62,7 +62,7 @@ class SuperResolution():
         
         
     @st.cache
-    def predict(self, image, task_type='Real-World Image Super-Resolution', jpeg=40, noise=15,scale=4):
+    def predict(self, image, scale=4):
         if self.args.scale != scale:
             self.change_scale(scale)
 

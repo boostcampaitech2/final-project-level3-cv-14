@@ -17,10 +17,10 @@ async def change_scale(scale:int=Form(...)):
 
 
 @app.post('/super')
-async def predict_super(image:UploadFile=File(...), scale:int=Form(...)):
+async def predict_super(image:UploadFile=File(...)):
     image_bytes = await image.read()
     image = ImageEncoder.Decode(image_bytes, channels=3)
-    new_image = sr_predictor.predict(image, scale=scale)
+    new_image = sr_predictor.predict(image, scale=4)
     img_byte = ImageEncoder.Encode(new_image)
     return Response(content=img_byte)
 
