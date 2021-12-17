@@ -13,11 +13,11 @@ ImageEncoder = __import__("ImageEncoder")
 peopleSeg = PeopleSegmentation('cuda')
 app = FastAPI()
 @app.post("/inference/")
-async def inference(image: bytes = File(...), mask: bytes = File(...)):
-    image = ImageEncoder.Decode(image, channels=1)
+async def inference(image: bytes = File(...)):
+    image = ImageEncoder.Decode(image)
     masks = peopleSeg.inference(image)
-    masks_bytes = ImageEncoder.Encode(masks, ext='jpg', quality=90)
+    masks_bytes = ImageEncoder.Encode(masks, ext='png')
     return Response(content=masks_bytes)
 
 if __name__ == '__main__':
-    uvicorn.run(app, host="0.0.0.0", port=8787)
+    uvicorn.run(app, host="0.0.0.0", port=8790)

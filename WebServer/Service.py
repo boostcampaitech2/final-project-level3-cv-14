@@ -78,7 +78,7 @@ def main():
         st.session_state["magnification"] = magnification
         RefreshCanvas()
 
-    st.text("히스토리")
+    st.sidebar.text("히스토리")
     history_col1, history_col2, history_col3 = st.sidebar.columns(3)
     flag_history_origin = history_col1.button("원본")
     flag_history_back = history_col2.button("뒤로")
@@ -186,9 +186,28 @@ def main():
         stroke_width = 1
 
     if drawing_mode == "Inpainting 영역 추천":
-        image_view = ''
+        image_bytes = ImageEncoder.Encode(st.session_state["image_current"], ext='jpg', quality=90)
+        response = requests.post('http://jiseong.iptime.org:8790/inference', files={'image': image_bytes})  # TODO: change into server addr
+        image_mask = ImageEncoder.Decode(response.content, channels=1)
+        k = cv2.getStructuringElement(cv2.MORPH_RECT, (15, 15))
+        image_mask = cv2.dilate(image_mask, k) # 팽창연산
+        image_mask = np.array(image_mask > 0.5, dtype=np.uint8)
+
+        cnt, labels = cv2.connectedComponents(image_mask)
+        image_mask = cv2.cvtColor(image_mask, cv2.COLOR_GRAY2RGB)
+
+        # 랜덤컬러 segment 방식
+        #result = np.zeros(st.session_state["image_current"].shape, dtype=np.uint8)
+        #for i in range(1, cnt):
+            #result[labels == i] = [int(j) for j in np.random.randint(0, 255, 3)]
+        #image_view = cv2.addWeighted(st.session_state["image_current"], 0.5, result.astype(np.uint8), 0.5, 0)
+
+        # 밝기만 조절하는 방식
+        image_view = cv2.addWeighted(st.session_state["image_current"], 0.7, (image_mask * (255, 255, 255)).astype(np.uint8), 0.3, 0)
+        st.session_state["image_segments_components"] = labels
     else:
         image_view = st.session_state["image_current"]
+        st.session_state["image_segments_components"] = None
 
     # 캔버스에 보여줄 이미지 * 배율
     image_view = cv2.resize(image_view, dsize=(0, 0), fx=magnification, fy=magnification)
@@ -222,11 +241,28 @@ def main():
                             continue
                         x1, y1, x2, y2 = map(int, dot[1:])
                         mask = cv2.line(mask, (x1, y1), (x2, y2), (1), stroke_width)
-        elif drawing_mode == "Inpainting 영역 추천":
-            ''
 
-        h,w = st.session_state["image_current"].shape[:2]
-        st.session_state["mask"] = cv2.resize(mask, dsize=(w,h))
+            h, w = st.session_state["image_current"].shape[:2]
+            st.session_state["mask"] = cv2.resize(mask, dsize=(w, h))
+
+        elif drawing_mode == "Inpainting 영역 추천":
+            for ob in drawing_objects.json_data["objects"]:
+                for dot in ob['path']:
+                    if dot[0] != 'L':
+                        continue
+                    x,y = map(int, dot[1:])
+                    st.session_state["image_segments_components_select"] = st.session_state["image_segments_components"][y][x]
+                    break
+
+            ma = st.session_state["image_segments_components"] == st.session_state["image_segments_components"][y][x]
+            ma = np.array(ma, dtype=np.uint8)
+            st.session_state["mask"] = ma
+
+            st.text("선택된 영역")
+            st.image(cv2.addWeighted(st.session_state["image_current"], 0.7, (cv2.cvtColor(ma,cv2.COLOR_GRAY2RGB) * (255, 255, 255)).astype(np.uint8), 0.3, 0))
+
+
+
 
     # 이미지 다운로드
     st.download_button(label="Image Download", data=ImageEncoder.Encode(st.session_state["image_current"]), file_name="image.jpg")
