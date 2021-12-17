@@ -218,5 +218,20 @@ def main():
         h,w = st.session_state["image_current"].shape[:2]
         st.session_state["mask"] = cv2.resize(mask, dsize=(w,h))
 
+    # 이미지 다운로드
+    st.download_button(label="Image Download", data=ImageEncoder.Encode(st.session_state["image_current"]), file_name="image.jpg")
+    
+    # 별점
+    score = st.radio("이 앱을 평가해주세요!",('5점', '4점', '3점', '2점', '1점'))
+    image_star = Image.open('WebServer/star.png')
+    cols = st.columns(20)
+    for idx in range(int(score[0])):
+        cols[idx].image(image_star)
+    
+    if st.button("평가하기"):
+        # TODO: 별점, 어떤 inference인지 DB에 저장
+        pass
+    
+
 if __name__ == "__main__":
     main()
