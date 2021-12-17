@@ -26,6 +26,8 @@ from streamlit_drawable_canvas import st_canvas
 
 sys.path.append(os.path.join(os.getcwd(), 'Utils'))
 ImageEncoder = __import__("ImageEncoder")
+from ErrorChecker import Sentry
+
 st.set_page_config(layout="wide")
 
 
@@ -242,4 +244,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    sentry = Sentry()
+    try:
+        main()
+    except Exception as e:
+        sentry.check(e)
