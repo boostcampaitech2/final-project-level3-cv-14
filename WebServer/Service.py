@@ -112,7 +112,7 @@ def main():
         mask_background = np.array(st.session_state["mask"]==0,dtype=np.uint8)
 
         image_bytes = ImageEncoder.Encode(st.session_state["image_current"], ext='jpg', quality=90)
-        response = requests.post('http://127.0.0.1:8000/super', files={'image': image_bytes})
+        response = requests.post('http://jiseong.iptime.org:8788/super', files={'image': image_bytes})
         result = ImageEncoder.Decode(response.content)
 
         image_quarter = cv2.resize(st.session_state["image_current"], dsize=(0,0), fx=4, fy=4)
