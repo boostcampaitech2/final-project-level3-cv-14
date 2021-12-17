@@ -1,8 +1,5 @@
 from fastapi import FastAPI, Response, UploadFile, File
-from starlette.responses import StreamingResponse
 import uvicorn
-from PIL import Image
-import io
 import sys
 import os
 sys.path.append(os.path.join(os.getcwd(), '../Utils'))
