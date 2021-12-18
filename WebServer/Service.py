@@ -171,8 +171,8 @@ def main():
         st.session_state["history"].append(st.session_state["image_current"])
         st.session_state["history_idx"] = len(st.session_state["history"]) - 1
 
-    # 그리기 도구
-    drawing_mode = st.selectbox("그리기 도구:", ["Rect", "Free Draw", "Inpainting 영역 추천"])
+    # 영역 선택 도구
+    drawing_mode = st.selectbox("영역 선택 도구:", ["Rect", "Free Draw", "Inpainting 영역 추천"])
     if drawing_mode == "Free Draw":
         tool = "freedraw"
         stroke_width = st.slider("Stroke width: ", 1, 50, 35)
