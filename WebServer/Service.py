@@ -265,7 +265,7 @@ def main():
 
 
     # 이미지 다운로드
-    st.download_button(label="Image Download", data=ImageEncoder.Encode(st.session_state["image_current"]), file_name="image.jpg")
+    st.download_button(label="Image Download", data=ImageEncoder.Encode(cv2.cvtColor(st.session_state["image_current"],cv2.COLOR_RGB2BGR)), file_name="image.jpg")
     
     # 별점
     score = st.radio("이 앱을 평가해주세요!",('5점', '4점', '3점', '2점', '1점'))
