@@ -24,6 +24,12 @@ import PIL.Image as Image
 import streamlit as st
 from streamlit_drawable_canvas import st_canvas
 
+
+import uuid
+from utils import send_to_bucket
+from db import insert_data_input, insert_data_inference, insert_data_score #, get_week_data_input, get_week_data_inference
+
+
 sys.path.append(os.path.join(os.getcwd(), 'Utils'))
 ImageEncoder = __import__("ImageEncoder")
 from ErrorChecker import Sentry
@@ -47,6 +53,21 @@ if st.session_state.get("history") is None:
 if st.session_state.get("history_idx") is None:
     st.session_state["history_idx"] = 0
 
+    
+def insert_input_table(input_id, image_bytes):
+    """
+    - input_id : uuid.uuid4().hex ,str , length :32
+    - image_bytes : input image to byte array
+    """
+    input_url = send_to_bucket(input_id, image_bytes)
+    insert_data_input(input_id, input_url)
+
+def insert_inference_table(input_id, inference_type, output_image_bytes, index=0):
+    inference_url = send_to_bucket(input_id+f'_{index}', output_image_bytes)
+    insert_data_inference(input_id, inference_url, inference_type)
+    return index+1
+
+
 def main():
     # 만약 이미지를 업로드 했다면 원본 이미지를 업로드이미지로 설정, 아니라면 데모 이미지로 설정
     image_uploaded = st.sidebar.file_uploader("Image Upload:", type=["png", "jpg"])
@@ -55,6 +76,8 @@ def main():
     else:
         image_origin = Image.open('WebServer/demo.jpg')
     image_origin = np.array(image_origin.convert('RGB'))
+    input_id = uuid.uuid4().hex 
+    is_image_in_input_table = False
 
     # 새 이미지를 업로드 했다면 image_current를 업데이트
     flag_newImage = st.session_state.get("image_origin") is None or not np.array_equal(st.session_state["image_origin"], image_origin)
@@ -100,6 +123,11 @@ def main():
             mask_bytes = ImageEncoder.Encode(st.session_state["mask"], ext='png')
             response = requests.post('http://jiseong.iptime.org:8786/inference/', files={'image': image_bytes, 'mask': mask_bytes})
             st.session_state["image_current"] = ImageEncoder.Decode(response.content)
+            if is_image_in_input_table==False:
+                insert_input_table(input_id, image_bytes)
+                is_image_in_input_table=True
+                next_index = 0
+            next_index = insert_inference_table(input_id=input_id, inference_type='inpainting', output_image_bytes=response.content, index=next_index)
 
             RefreshCanvas()
         else:
@@ -123,6 +151,12 @@ def main():
         image_background = cv2.bitwise_and(image_quarter, image_quarter, mask=mask_background_quarter)
 
         st.session_state["image_current"] = image_front+image_background
+        if is_image_in_input_table==False:
+            insert_input_table(input_id, image_bytes)
+            is_image_in_input_table=True
+            next_index = 0
+        next_index = insert_inference_table(input_id=input_id, inference_type='superResolution', output_image_bytes=response.content, index=next_index)
+        
         RefreshCanvas()
 
     elif flag_deblur:
@@ -139,12 +173,19 @@ def main():
         image_background = cv2.bitwise_and(st.session_state["image_current"],st.session_state["image_current"],mask=mask_background)
 
         st.session_state["image_current"] = image_front+image_background
+        if is_image_in_input_table==False:
+            insert_input_table(input_id, image_bytes)
+            is_image_in_input_table=True
+            next_index = 0
+        next_index = insert_inference_table(input_id=input_id, inference_type='deblur', output_image_bytes=response.content, index=next_index)
+        
         RefreshCanvas()
 
     elif flag_crop:
         y, x = np.nonzero(st.session_state["mask"])
         x1, y1, x2, y2 = np.min(x), np.min(y), np.max(x), np.max(y)
         st.session_state["image_current"] = st.session_state["image_current"][y1:y2, x1:x2]
+        
         RefreshCanvas()
 
     elif flag_history_back:
