@@ -317,7 +317,7 @@ def main():
     
     if st.button("평가하기"):
         # TODO: 별점, 어떤 inference인지 DB에 저장
-        pass
+        insert_data_score(input_id, score[0])
 
 
 if __name__ == "__main__":
