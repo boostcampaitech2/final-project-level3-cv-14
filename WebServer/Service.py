@@ -54,13 +54,18 @@ if st.session_state.get("history_idx") is None:
     st.session_state["history_idx"] = 0
 
     
-def insert_input_table(input_id, image_bytes):
+def insert_input_table(input_id, image_bytes, is_image_in_input_table):
     """
-    - input_id : uuid.uuid4().hex ,str , length :32
+    - input_id : uuid.uuid4().hex ,str , length : 32
     - image_bytes : input image to byte array
+    - is_image_in_input_table : INPUT table에 이미 존재하는 input_id라면 True
     """
-    input_url = send_to_bucket(input_id, image_bytes)
-    insert_data_input(input_id, input_url)
+    if is_image_in_input_table==False:
+        input_url = send_to_bucket(input_id, image_bytes)
+        insert_data_input(input_id, input_url)
+        is_image_in_input_table=True
+    else:
+        pass
 
 def insert_inference_table(input_id, inference_type, output_image_bytes, index=0):
     inference_url = send_to_bucket(input_id+f'_{index}', output_image_bytes)
@@ -76,7 +81,7 @@ def main():
     else:
         image_origin = Image.open('WebServer/demo.jpg')
     image_origin = np.array(image_origin.convert('RGB'))
-    input_id = uuid.uuid4().hex 
+    input_id = uuid.uuid4().hex  
     is_image_in_input_table = False
 
     # 새 이미지를 업로드 했다면 image_current를 업데이트
@@ -124,9 +129,8 @@ def main():
             response = requests.post('http://jiseong.iptime.org:8786/inference/', files={'image': image_bytes, 'mask': mask_bytes})
             st.session_state["image_current"] = ImageEncoder.Decode(response.content)
             if is_image_in_input_table==False:
-                insert_input_table(input_id, image_bytes)
-                is_image_in_input_table=True
-                next_index = 0
+                insert_input_table(input_id, image_bytes, is_image_in_input_table)
+                next_index = 0 #inference index start
             next_index = insert_inference_table(input_id=input_id, inference_type='inpainting', output_image_bytes=response.content, index=next_index)
 
             RefreshCanvas()
@@ -152,9 +156,8 @@ def main():
 
         st.session_state["image_current"] = image_front+image_background
         if is_image_in_input_table==False:
-            insert_input_table(input_id, image_bytes)
-            is_image_in_input_table=True
-            next_index = 0
+            insert_input_table(input_id, image_bytes, is_image_in_input_table)
+            next_index = 0 #inference index start
         next_index = insert_inference_table(input_id=input_id, inference_type='superResolution', output_image_bytes=response.content, index=next_index)
         
         RefreshCanvas()
@@ -174,9 +177,8 @@ def main():
 
         st.session_state["image_current"] = image_front+image_background
         if is_image_in_input_table==False:
-            insert_input_table(input_id, image_bytes)
-            is_image_in_input_table=True
-            next_index = 0
+            insert_input_table(input_id, image_bytes, is_image_in_input_table)
+            next_index = 0 #inference index start
         next_index = insert_inference_table(input_id=input_id, inference_type='deblur', output_image_bytes=response.content, index=next_index)
         
         RefreshCanvas()
