@@ -1,0 +1,7 @@
+big-lama/
+__pycache__/
+.idea/
+.ipynb_checkpoints
+port.ps1
+.pth
+pretrained_models/

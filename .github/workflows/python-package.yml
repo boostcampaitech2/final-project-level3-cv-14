@@ -1,0 +1,46 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: git pull
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  git_pull:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Update Super Resolution server using ssh key
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SSH_IP_JSH }} 
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY_JSH }}
+        port: ${{ secrets.SSH_PORT_JSH }}
+        script: |
+            cd /opt/ml/final-project
+            git pull origin main
+            
+#     - name: Update Deblur server using ssh key
+#       uses: appleboy/ssh-action@master
+#       with:
+#         host: ${{ secrets.SSH_IP_KJT }} 
+#         username: ${{ secrets.USERNAME }}
+#         key: ${{ secrets.SSH_KEY_KJT }}
+#         port: ${{ secrets.SSH_PORT_KJT }}
+#         script: |
+#             git pull origin main
+            
+            
+#     - name: Update Image Inpainting server using ssh key
+#       uses: appleboy/ssh-action@master
+#       with:
+#         host: ${{ secrets.SSH_IP_KJS }} 
+#         username: ${{ secrets.USERNAME }}
+#         key: ${{ secrets.SSH_KEY_KJS }}
+#         port: ${{ secrets.SSH_PORT_KJS }}
+#         script: |
+#             git pull origin main
