@@ -8,8 +8,9 @@
  - 잘라내기, 배율을 통해 원하는 부분을 축소, 확대할 수 있습니다.
  - "원본", "뒤로", "앞으로" 히스토리 도구 : 세가지 히스토리 기능을 통해 과거 작업을 잃어버리지 않도록 편의 기능을 제공합니다.
  - "그리기 도구" : Free Draw, Rect 기능으로 원하는 영역을 선택할 수 있는 기능을 제공합니다.
+ - 입력 이미지 정보, 추론 이미지 정보, 사용자 스코어는 Cloud SQL DB의 각각의 테이블에 저장되며 이미지 byte는 Cloud Storage에 저장됩니다. 
 
-작성자 김지성
+작성자 김지성, 홍지연
 최종 수정일 2021-12-16
 '''
 
@@ -23,6 +24,12 @@ import PIL.Image as Image
 
 import streamlit as st
 from streamlit_drawable_canvas import st_canvas
+
+
+import uuid
+from utils import send_to_bucket
+from db import insert_data_input, insert_data_inference, insert_data_score 
+
 
 sys.path.append(os.path.join(os.getcwd(), 'Utils'))
 ImageEncoder = __import__("ImageEncoder")
@@ -46,6 +53,36 @@ if st.session_state.get("history") is None:
 
 if st.session_state.get("history_idx") is None:
     st.session_state["history_idx"] = 0
+    
+if st.session_state.get('is_image_in_input_table') is None:
+    st.session_state['is_image_in_input_table'] = False
+    
+if st.session_state.get('input_id') is None:
+    st.session_state['input_id'] = uuid.uuid4().hex
+    
+if st.session_state.get('inference_index') is None:
+    st.session_state['inference_index'] = 0
+
+    
+def insert_input_table(input_id, image_bytes):
+    """
+    - input_id : uuid.uuid4().hex ,str , length : 32
+    - image_bytes : input image to byte array
+    """
+    if st.session_state['is_image_in_input_table']==False:
+        input_url = send_to_bucket(input_id, image_bytes)
+        insert_data_input(input_id, input_url)
+        st.session_state['is_image_in_input_table']=True
+    else:
+        pass
+
+    
+def insert_inference_table(input_id, inference_type, output_image_bytes):
+    inference_index = st.session_state['inference_index']
+    inference_url = send_to_bucket(input_id+f'_{inference_index}', output_image_bytes)
+    insert_data_inference(input_id, inference_url, inference_type)
+    st.session_state['inference_index'] += 1
+
 
 def main():
     # 만약 이미지를 업로드 했다면 원본 이미지를 업로드이미지로 설정, 아니라면 데모 이미지로 설정
@@ -55,6 +92,7 @@ def main():
     else:
         image_origin = Image.open('WebServer/demo.jpg')
     image_origin = np.array(image_origin.convert('RGB'))
+    #st.session_state['input_id'] = uuid.uuid4().hex  
 
     # 새 이미지를 업로드 했다면 image_current를 업데이트
     flag_newImage = st.session_state.get("image_origin") is None or not np.array_equal(st.session_state["image_origin"], image_origin)
@@ -100,6 +138,9 @@ def main():
             mask_bytes = ImageEncoder.Encode(st.session_state["mask"], ext='png')
             response = requests.post('http://jiseong.iptime.org:8786/inference/', files={'image': image_bytes, 'mask': mask_bytes})
             st.session_state["image_current"] = ImageEncoder.Decode(response.content)
+            
+            insert_input_table(st.session_state['input_id'], image_bytes)
+            insert_inference_table(input_id=st.session_state['input_id'], inference_type='inpainting', output_image_bytes=response.content)
 
             RefreshCanvas()
         else:
@@ -123,6 +164,10 @@ def main():
         image_background = cv2.bitwise_and(image_quarter, image_quarter, mask=mask_background_quarter)
 
         st.session_state["image_current"] = image_front+image_background
+
+        insert_input_table(st.session_state['input_id'], image_bytes)
+        insert_inference_table(input_id=st.session_state['input_id'], inference_type='superResolution', output_image_bytes=response.content)
+        
         RefreshCanvas()
 
     elif flag_deblur:
@@ -139,12 +184,16 @@ def main():
         image_background = cv2.bitwise_and(st.session_state["image_current"],st.session_state["image_current"],mask=mask_background)
 
         st.session_state["image_current"] = image_front+image_background
+        insert_input_table(st.session_state['input_id'], image_bytes)
+        insert_inference_table(input_id=st.session_state['input_id'], inference_type='deblur', output_image_bytes=response.content)
+        
         RefreshCanvas()
 
     elif flag_crop:
         y, x = np.nonzero(st.session_state["mask"])
         x1, y1, x2, y2 = np.min(x), np.min(y), np.max(x), np.max(y)
         st.session_state["image_current"] = st.session_state["image_current"][y1:y2, x1:x2]
+        
         RefreshCanvas()
 
     elif flag_history_back:
@@ -276,7 +325,7 @@ def main():
     
     if st.button("평가하기"):
         # TODO: 별점, 어떤 inference인지 DB에 저장
-        pass
+        insert_data_score(st.session_state['input_id'], score[0])
 
 
 if __name__ == "__main__":

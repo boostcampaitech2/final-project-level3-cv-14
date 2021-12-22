@@ -5,3 +5,7 @@ streamlit_drawable_canvas
 python-multipart
 opencv-python
 sentry-sdk
+oauth2client==4.1.3
+toml==0.10.2
+mysql-connector-python
+google-cloud-storage
