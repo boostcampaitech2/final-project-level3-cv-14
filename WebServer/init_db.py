@@ -1,5 +1,5 @@
 '''
-database를 초기화한다.
+database를 초기화합니다 .
 '''
 import toml
 import mysql.connector
@@ -25,7 +25,7 @@ with conn.cursor() as cur:
 
 conn.close()
 
-# serving_database 데이터베이스안에 pictures 테이블 생성
+# serving_database 데이터베이스안에 INPUT, INFERENCE, SCORE 테이블 생성
 conn =  mysql.connector.connect(
     host=secrets['mysql']['host'],
     user=secrets['mysql']['user'],
