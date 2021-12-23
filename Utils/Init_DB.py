@@ -1,10 +1,10 @@
 '''
-database를 초기화합니다 .
+database를 초기화합니다.
 '''
 import toml
 import mysql.connector
 
-secrets = toml.load("WebServer/secret/secrets.toml")
+secrets = toml.load("Utils/streamlit/secrets.toml")
 
 # serving_database 데이터베이스 생성 
 conn =  mysql.connector.connect(
@@ -39,6 +39,7 @@ with conn.cursor() as cur:
         sql = "DROP TABLE "
         cur.execute(sql+"INPUT")
         cur.execute(sql+"INFERENCE")
+        cur.execute(sql+"MASK")
         cur.execute(sql+"SCORE")
     except:
         pass
@@ -66,6 +67,15 @@ with conn.cursor() as cur:
         id INT AUTO_INCREMENT PRIMARY KEY,
         input_id VARCHAR(36),
         score VARCHAR(10)
+    )
+    """)
+    cur.execute("""
+    CREATE TABLE MASK 
+    (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        input_id VARCHAR(36),
+        mask_url VARCHAR(255),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
 

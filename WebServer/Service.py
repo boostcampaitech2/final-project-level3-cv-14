@@ -24,15 +24,13 @@ import PIL.Image as Image
 
 import streamlit as st
 from streamlit_drawable_canvas import st_canvas
-
-
 import uuid
-from utils import send_to_bucket
-from db import insert_data_input, insert_data_inference, insert_data_score 
 
 
 sys.path.append(os.path.join(os.getcwd(), 'Utils'))
 ImageEncoder = __import__("ImageEncoder")
+Storage = __import__("Storage")
+DB = __import__("DB")
 from ErrorChecker import Sentry
 
 st.set_page_config(layout="wide")
@@ -64,24 +62,28 @@ if st.session_state.get('inference_index') is None:
     st.session_state['inference_index'] = 0
 
     
-def insert_input_table(input_id, image_bytes):
-    """
-    - input_id : uuid.uuid4().hex ,str , length : 32
-    - image_bytes : input image to byte array
-    """
+def insert_input_table(input_id, image):
+    image_bytes = ImageEncoder.Encode(cv2.cvtColor(image, cv2.COLOR_RGB2BGR), ext='jpg', quality=90)
     if st.session_state['is_image_in_input_table']==False:
-        input_url = send_to_bucket(input_id, image_bytes)
-        insert_data_input(input_id, input_url)
+        input_url = Storage.send_to_bucket(input_id, image_bytes)
+        DB.insert_data_input(input_id, input_url)
         st.session_state['is_image_in_input_table']=True
     else:
         pass
 
     
-def insert_inference_table(input_id, inference_type, output_image_bytes):
+def insert_inference_table(input_id, inference_type, output_image):
+    output_image_bytes = ImageEncoder.Encode(cv2.cvtColor(output_image, cv2.COLOR_BGR2RGB), ext='jpg', quality=90)
     inference_index = st.session_state['inference_index']
-    inference_url = send_to_bucket(input_id+f'_{inference_index}', output_image_bytes)
-    insert_data_inference(input_id, inference_url, inference_type)
+    inference_url = Storage.send_to_bucket(input_id+f'_{inference_index}', output_image_bytes)
+    DB.insert_data_inference(input_id, inference_url, inference_type)
     st.session_state['inference_index'] += 1
+
+
+def insert_mask_table(input_id, mask_bytes):
+    mask_index = st.session_state['inference_index']
+    mask_url = Storage.send_to_bucket(input_id+f'_{mask_index}_mask', mask_bytes)
+    DB.insert_data_mask(input_id, mask_url)
 
 
 def main():
@@ -139,10 +141,11 @@ def main():
             image_bytes = ImageEncoder.Encode(st.session_state["image_current"], ext='jpg', quality=90)
             mask_bytes = ImageEncoder.Encode(st.session_state["mask"], ext='png')
             response = requests.post('http://jiseong.iptime.org:8786/inference/', files={'image': image_bytes, 'mask': mask_bytes})
-            st.session_state["image_current"] = ImageEncoder.Decode(response.content)
             
-            insert_input_table(st.session_state['input_id'], image_bytes)
-            insert_inference_table(input_id=st.session_state['input_id'], inference_type='inpainting', output_image_bytes=response.content)
+            insert_input_table(st.session_state['input_id'], st.session_state["image_current"])
+            st.session_state["image_current"] = ImageEncoder.Decode(response.content)
+            insert_mask_table(input_id=st.session_state['input_id'], mask_bytes=mask_bytes)
+            insert_inference_table(input_id=st.session_state['input_id'], inference_type='inpainting', output_image=st.session_state["image_current"])
 
             RefreshCanvas()
         else:
@@ -165,10 +168,9 @@ def main():
         image_front = cv2.bitwise_and(result, result, mask=mask_front_quarter)
         image_background = cv2.bitwise_and(image_quarter, image_quarter, mask=mask_background_quarter)
 
+        insert_input_table(st.session_state['input_id'], st.session_state["image_current"])
         st.session_state["image_current"] = image_front+image_background
-
-        insert_input_table(st.session_state['input_id'], image_bytes)
-        insert_inference_table(input_id=st.session_state['input_id'], inference_type='superResolution', output_image_bytes=response.content)
+        insert_inference_table(input_id=st.session_state['input_id'], inference_type='superResolution', output_image=st.session_state["image_current"])
         
         RefreshCanvas()
 
@@ -185,9 +187,9 @@ def main():
         image_front = cv2.bitwise_and(result, result, mask=mask_front)
         image_background = cv2.bitwise_and(st.session_state["image_current"],st.session_state["image_current"],mask=mask_background)
 
+        insert_input_table(st.session_state['input_id'], st.session_state["image_current"])
         st.session_state["image_current"] = image_front+image_background
-        insert_input_table(st.session_state['input_id'], image_bytes)
-        insert_inference_table(input_id=st.session_state['input_id'], inference_type='deblur', output_image_bytes=response.content)
+        insert_inference_table(input_id=st.session_state['input_id'], inference_type='deblur', output_image=st.session_state["image_current"])
         
         RefreshCanvas()
 
@@ -326,7 +328,7 @@ def main():
         cols[idx].image(image_star)
     
     if st.button("평가하기"):
-        insert_data_score(st.session_state['input_id'], score[0])
+        DB.insert_data_score(st.session_state['input_id'], score[0])
 
 
 if __name__ == "__main__":

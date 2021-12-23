@@ -1,6 +1,6 @@
 '''
-- 이미지 정보를 INPUT, INFERENCE, SCORE 테이블에 입력
-- INPUT, INFERENCE 테이블로부터 target_date에 해당하는 주차의 데이터를 불러옴
+- 이미지 정보를 INPUT, INFERENCE, SCORE, MASK(inpainting 모듈만 해당) 테이블에 입력합니다.
+- INPUT, INFERENCE 테이블로부터 target_date에 해당하는 WEEK의 데이터를 불러옵니다.
 '''
 import toml
 import mysql.connector
@@ -13,7 +13,7 @@ def _execute(qry, val, is_select=False):
     - val: COLUMN NAME
     - is_select : True이면 SELECT, False이면 INSERT
     """
-    secrets = toml.load("WebServer/secret/secrets.toml")
+    secrets = toml.load("Utils/streamlit/secrets.toml")
     conn =  mysql.connector.connect(
         host=secrets['mysql']['host'],
         user=secrets['mysql']['user'],
@@ -33,6 +33,7 @@ def _execute(qry, val, is_select=False):
     return result
 
 
+#insert
 def insert_data_input(input_id, input_url):
     qry = "INSERT INTO INPUT (input_id, input_url) VALUES (%s, %s)"
     val = (input_id, input_url)
@@ -44,6 +45,12 @@ def insert_data_inference(input_id, inference_url, inference_type):
     val = (input_id, inference_url, inference_type)
     _ = _execute(qry, val, is_select=False)
     
+
+def insert_data_mask(input_id, mask_url):
+    qry = "INSERT INTO MASK (input_id, mask_url) VALUES (%s, %s)"
+    val = (input_id, mask_url)
+    _ = _execute(qry, val, is_select=False)
+    
     
 def insert_data_score(input_id, score):
     qry = "INSERT INTO SCORE (input_id, score) VALUES (%s, %s)"
@@ -51,6 +58,7 @@ def insert_data_score(input_id, score):
     _ = _execute(qry, val, is_select=False)
     
 
+# select
 def get_week_data_input(target_date): 
     """target_date 주에 해당하는 주차 데이터를 불러오기. (from INPUT table)
     """
@@ -63,6 +71,13 @@ def get_week_data_inference(target_date):
     """target_date 주에 해당하는 주차 데이터를 불러오기. (from INFERENCE table)
     """
     qry = "SELECT * FROM INFERENCE WHERE EXTRACT(WEEK FROM created_at) = EXTRACT(WEEK FROM %s)"
+    val = (target_date, )
+    return _execute(qry, val, is_select=True)
+
+def get_week_data_mask(target_date): 
+    """target_date 주에 해당하는 주차 데이터를 불러오기. (from MASK table)
+    """
+    qry = "SELECT * FROM MASK WHERE EXTRACT(WEEK FROM created_at) = EXTRACT(WEEK FROM %s)"
     val = (target_date, )
     return _execute(qry, val, is_select=True)
 
