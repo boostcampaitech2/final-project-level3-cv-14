@@ -80,6 +80,12 @@ def insert_inference_table(input_id, inference_type, output_image):
     st.session_state['inference_index'] += 1
 
 
+def insert_mask_table(input_id, mask_bytes):
+    mask_index = st.session_state['inference_index']
+    mask_url = Storage.send_to_bucket(input_id+f'_{mask_index}_mask', mask_bytes)
+    DB.insert_data_mask(input_id, mask_url)
+
+
 def main():
     # 만약 이미지를 업로드 했다면 원본 이미지를 업로드이미지로 설정, 아니라면 데모 이미지로 설정
     image_uploaded = st.sidebar.file_uploader("Image Upload:", type=["png", "jpg"])
@@ -138,6 +144,7 @@ def main():
             
             insert_input_table(st.session_state['input_id'], st.session_state["image_current"])
             st.session_state["image_current"] = ImageEncoder.Decode(response.content)
+            insert_mask_table(input_id=st.session_state['input_id'], mask_bytes=mask_bytes)
             insert_inference_table(input_id=st.session_state['input_id'], inference_type='inpainting', output_image=st.session_state["image_current"])
 
             RefreshCanvas()
