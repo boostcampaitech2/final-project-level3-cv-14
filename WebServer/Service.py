@@ -100,6 +100,9 @@ def main():
         # 새로 업로드
         st.session_state["image_origin"] = image_origin
         st.session_state["image_current"] = image_origin
+        st.session_state['is_image_in_input_table'] = False
+        st.session_state['input_id'] = uuid.uuid4().hex
+        st.session_state['inference_index'] = 0
         RefreshCanvas()
 
     st.sidebar.text("AI 복원")
