@@ -33,6 +33,8 @@ from db import insert_data_input, insert_data_inference, insert_data_score
 
 sys.path.append(os.path.join(os.getcwd(), 'Utils'))
 ImageEncoder = __import__("ImageEncoder")
+Storage = __import__("Storage")
+DB = __import__("DB")
 from ErrorChecker import Sentry
 
 st.set_page_config(layout="wide")
@@ -65,13 +67,9 @@ if st.session_state.get('inference_index') is None:
 
     
 def insert_input_table(input_id, image_bytes):
-    """
-    - input_id : uuid.uuid4().hex ,str , length : 32
-    - image_bytes : input image to byte array
-    """
     if st.session_state['is_image_in_input_table']==False:
-        input_url = send_to_bucket(input_id, image_bytes)
-        insert_data_input(input_id, input_url)
+        input_url = Storage.send_to_bucket(input_id, image_bytes)
+        DB.insert_data_input(input_id, input_url)
         st.session_state['is_image_in_input_table']=True
     else:
         pass
@@ -79,8 +77,8 @@ def insert_input_table(input_id, image_bytes):
     
 def insert_inference_table(input_id, inference_type, output_image_bytes):
     inference_index = st.session_state['inference_index']
-    inference_url = send_to_bucket(input_id+f'_{inference_index}', output_image_bytes)
-    insert_data_inference(input_id, inference_url, inference_type)
+    inference_url = Storage.send_to_bucket(input_id+f'_{inference_index}', output_image_bytes)
+    DB.insert_data_inference(input_id, inference_url, inference_type)
     st.session_state['inference_index'] += 1
 
 
