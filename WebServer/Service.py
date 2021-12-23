@@ -92,7 +92,6 @@ def main():
     else:
         image_origin = Image.open('WebServer/demo.jpg')
     image_origin = np.array(image_origin.convert('RGB'))
-    #st.session_state['input_id'] = uuid.uuid4().hex  
 
     # 새 이미지를 업로드 했다면 image_current를 업데이트
     flag_newImage = st.session_state.get("image_origin") is None or not np.array_equal(st.session_state["image_origin"], image_origin)
@@ -327,7 +326,6 @@ def main():
         cols[idx].image(image_star)
     
     if st.button("평가하기"):
-        # TODO: 별점, 어떤 inference인지 DB에 저장
         insert_data_score(st.session_state['input_id'], score[0])
 
 
