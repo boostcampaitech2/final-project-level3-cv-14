@@ -5,4 +5,4 @@ __pycache__/
 port.ps1
 .pth
 pretrained_models/
-.Utils/streamlit/
+streamlit/
