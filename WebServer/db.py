@@ -20,16 +20,14 @@ def _execute(qry, val, is_select=False):
         passwd=secrets['mysql']['password'],
         database=secrets['mysql']['database']
         )
-    #print(qry, val)
     
     with conn.cursor(dictionary=True) as cur: 
         cur.execute(qry, val)
         if is_select:
             result = cur.fetchall()
         else:
-            conn.commit() #하나의 transaction이 정상적으로 끝났음을 관리자에게 알려주기 위해 commit해줘야함.
-            result = cur.lastrowid # INSERT한 ROW
-        #print(result)
+            conn.commit()
+            result = cur.lastrowid 
 
     conn.close()
     return result
@@ -53,18 +51,18 @@ def insert_data_score(input_id, score):
     _ = _execute(qry, val, is_select=False)
     
 
-# def get_week_data_input(target_date): 
-#     """target_date 주에 해당하는 주차 데이터를 불러오기. (from INPUT table)
-#     """
-#     qry = SELECT * FROM INPUT WHERE EXTRACT(WEEK FROM created_at) = EXTRACT(WEEK FROM (%s))
-#     val = (target_date, )
-#     return _execute(qry, val, is_select=True)
+def get_week_data_input(target_date): 
+    """target_date 주에 해당하는 주차 데이터를 불러오기. (from INPUT table)
+    """
+    qry = "SELECT * FROM INPUT WHERE EXTRACT(WEEK FROM created_at) = EXTRACT(WEEK FROM (%s))"
+    val = (target_date, )
+    return _execute(qry, val, is_select=True)
 
 
-# def get_week_data_inference(target_date): 
-#     """target_date 주에 해당하는 주차 데이터를 불러오기. (from INFERENCE table)
-#     """
-#     qry = SELECT * FROM INFERENCE WHERE EXTRACT(WEEK FROM created_at) = EXTRACT(WEEK FROM %s)
-#     val = (target_date, )
-#     return _execute(qry, val, is_select=True)
+def get_week_data_inference(target_date): 
+    """target_date 주에 해당하는 주차 데이터를 불러오기. (from INFERENCE table)
+    """
+    qry = "SELECT * FROM INFERENCE WHERE EXTRACT(WEEK FROM created_at) = EXTRACT(WEEK FROM %s)"
+    val = (target_date, )
+    return _execute(qry, val, is_select=True)
 
