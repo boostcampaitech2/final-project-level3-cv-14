@@ -24,6 +24,8 @@ App : [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_b
 
 
 ## 서비스 파이프라인
+![image](https://user-images.githubusercontent.com/44287798/147332789-174092c5-00e0-43e7-a21e-052020d4955c.png)
+
 
 ## 실행방법
 
