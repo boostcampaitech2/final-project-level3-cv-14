@@ -4,8 +4,10 @@ CV 14조 final project
 ## 프로젝트 소개
 
 ### 시연 영상
-
 [![Video Label](http://img.youtube.com/vi/Mnqi91GWhiY/0.jpg)](https://www.youtube.com/watch?v=Mnqi91GWhiY)
+
+### 발표 영상
+[![Video Label](http://img.youtube.com/vi/wU9lCHz9TI4/0.jpg)](https://www.youtube.com/watch?v=wU9lCHz9TI4)
 
 ### 서비스 사용해보기
 App : [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/intelli8786/ai_blemishesremover/main/WebServer/Service.py)
