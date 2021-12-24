@@ -45,13 +45,13 @@ App : [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_b
 
 #### Environment setup
 1. Deblur
-pip install -r ```Deblur/requirements.txt```
+```pip install -r Deblur/requirements.txt```
 
 2. Inpainting
-pip install -r ```Inpainting/requirements.txt```
+```pip install -r Inpainting/requirements.txt```
 
 3. Segmentation
-pip install -r ```Segmentation/requirements.txt```
+```pip install -r Segmentation/requirements.txt```
 
 4. SuperResolution
-pip install -r ```SuperResolution/requirements.txt```
+```pip install -r SuperResolution/requirements.txt```
