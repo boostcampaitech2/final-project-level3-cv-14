@@ -13,6 +13,15 @@ App : [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_b
 
 ## 팀원 소개
 
+||이름|역할|github|
+|--|------|---|---|
+|😙|김범수|Prototype 개발,SuperResolution 모듈 개발,Github actions|https://github.com/HYU-kbs|
+|🤗|김준태|Prototype 개발,Deblur 모듈 개발,서비스 고도화 연구|https://github.com/sronger|
+|😎|김지성|PM,Prototype 개발,Inpainting모듈 개발,학습,Segmentation모듈 개발,REST API 개발,WebAPP 개발,프로젝트 통합|https://github.com/intelli8786|
+|😊|정소희|서비스 요구사항 분석,Prototype 개발,REST API 개발,SuperResolution,모듈 개발,Error Handling|https://github.com/SoheeJeong|
+|😄|홍지연|Prototype 개발,Segmentation 모듈개발,Cloud SQL 및,Storage 연동|https://github.com/hongjourney|
+
+
 
 ## 서비스 파이프라인
 
