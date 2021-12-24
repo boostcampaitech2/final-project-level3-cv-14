@@ -54,4 +54,4 @@ App : [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_b
 
 4. SuperResolution: ```pip install -r SuperResolution/requirements.txt```
 
-5. Streamlit Cloud ```pip install -r packages.txt.txt```
+5. Streamlit Cloud ```pip install -r packages.txt```
