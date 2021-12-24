@@ -42,3 +42,16 @@ App : [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_b
 #### weight file 다운로드
 1. Super Resolution: ```bash SuperResolution/download-weights.sh```
 2. Deblur: ```bash Deblur/download-weights.sh```
+
+#### Environment setup
+1. Deblur
+pip install -r Deblur/requirements.txt
+
+2. Inpainting
+pip install -r Inpainting/requirements.txt
+
+3. Segmentation
+pip install -r Segmentation/requirements.txt
+
+4. SuperResolution
+pip install -r SuperResolution/requirements.txt
