@@ -45,12 +45,6 @@ App : [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_b
 
 ## 실행방법
 
-### Super Resolution & Deblur module
-
-#### Inference code & Pretrained weight Repo
-* [SwinIR](https://github.com/JingyunLiang/SwinIR)
-* [Deblur](https://github.com/swz30/MPRNet.git)
-
 #### 서비스 실행 방법
 ##### Web Server Run
 ```streamlit run WebServer/Server_SRD.py```
@@ -74,7 +68,11 @@ App : [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_b
 
 ```python3 Server.py```
 
-#### weight file 다운로드
+#### pretrained weight file 다운로드
+#### Inference code & Pretrained weight Repo
+* [SwinIR](https://github.com/JingyunLiang/SwinIR)
+* [Deblur](https://github.com/swz30/MPRNet.git)
+
 1. Super Resolution: ```bash SuperResolution/download-weights.sh```
 2. Deblur: ```bash Deblur/download-weights.sh```
 
