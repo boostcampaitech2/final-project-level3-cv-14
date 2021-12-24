@@ -19,4 +19,4 @@ App : [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_b
 
 ### weight file 다운로드
 1. Super Resolution: ```bash SuperResolution/download-weights.sh```
-2. Deblur: ```bash Deblur/SRNDeblur/checkpoints/download_model.sh```
+2. Deblur: ```bash Deblur/download-weights.sh```
