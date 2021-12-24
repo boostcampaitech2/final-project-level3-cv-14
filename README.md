@@ -49,7 +49,7 @@ App : [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_b
 
 #### Inference code & Pretrained weight Repo
 * [SwinIR](https://github.com/JingyunLiang/SwinIR)
-* [Deblur](https://github.com/jiangsutx/SRN-Deblur)
+* [Deblur](https://github.com/swz30/MPRNet.git)
 
 #### 서비스 실행방법
 1. ```streamlit run WebServer/Server_SRD.py --server.port=6006```
