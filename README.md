@@ -51,9 +51,28 @@ App : [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_b
 * [SwinIR](https://github.com/JingyunLiang/SwinIR)
 * [Deblur](https://github.com/swz30/MPRNet.git)
 
-#### 서비스 실행방법
-1. ```streamlit run WebServer/Server_SRD.py --server.port=6006```
-2. port만 변경해서 접속 (ex:6006->6014)
+#### 서비스 실행 방법
+##### Web Server Run
+```streamlit run WebServer/Server_SRD.py```
+##### Inpainting REST API Server Run
+```cd Inpainting```
+
+```python3 Server.py```
+
+##### Semantic REST API Segmentation Server Run
+```cd Segmentation```
+
+```python3 Server.py```
+
+##### Super REST API Resolution Server Run
+```cd SuperResolution```
+
+```python3 Server.py```
+
+##### Deblur REST API Server Run
+```cd Deblur```
+
+```python3 Server.py```
 
 #### weight file 다운로드
 1. Super Resolution: ```bash SuperResolution/download-weights.sh```
